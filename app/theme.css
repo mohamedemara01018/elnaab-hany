@@ -1,0 +1,567 @@
+/* ===========================================================
+    Civic Prestige — Design Tokens (Arabic / RTL)
+    Light theme: source-of-truth palette from the design system.
+    Dark theme: derived using Material-3 tonal conventions —
+    "fixed" roles stay constant across themes; surface/on-surface/
+    primary/secondary/tertiary roles swap to their dark-tone pairs.
+    Content language: Arabic only — typography uses the Tajawal /
+    Cairo pairing across both themes and both LTR/RTL directions.
+    =========================================================== */
+
+:root {
+    color-scheme: light;
+    direction: rtl;
+
+    /* ---- Surfaces ---- */
+    --color-surface: #faf9f6;
+    --color-surface-dim: #dbdad7;
+    --color-surface-bright: #faf9f6;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f4f3f0;
+    --color-surface-container: #efeeeb;
+    --color-surface-container-high: #e9e8e5;
+    --color-surface-container-highest: #e3e2df;
+    --color-surface-variant: #e3e2df;
+
+    --color-on-surface: #1b1c1a;
+    --color-on-surface-variant: #4e4639;
+
+    --color-inverse-surface: #2f312f;
+    --color-inverse-on-surface: #f2f1ee;
+
+    --color-outline: #807667;
+    --color-outline-variant: #d1c5b4;
+
+    /* ---- Primary (Gold) ---- */
+    --color-surface-tint: #77591f;
+    --color-primary: #77591f;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #b69252;
+    --color-on-primary-container: #412c00;
+    --color-inverse-primary: #e9c17c;
+
+    /* ---- Secondary (Slate) ---- */
+    --color-secondary: #546067;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #d7e4ec;
+    --color-on-secondary-container: #5a666d;
+
+    /* ---- Tertiary (Deep Gold) ---- */
+    --color-tertiary: #715c28;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #ae945a;
+    --color-on-tertiary-container: #3e2d00;
+
+    /* ---- Error ---- */
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #93000a;
+
+    /* ---- Fixed roles (identical in light & dark) ---- */
+    --color-primary-fixed: #ffdea9;
+    --color-primary-fixed-dim: #e9c17c;
+    --color-on-primary-fixed: #271900;
+    --color-on-primary-fixed-variant: #5d4207;
+    --color-secondary-fixed: #d7e4ec;
+    --color-secondary-fixed-dim: #bbc8d0;
+    --color-on-secondary-fixed: #111d23;
+    --color-on-secondary-fixed-variant: #3c494f;
+    --color-tertiary-fixed: #fedf9e;
+    --color-tertiary-fixed-dim: #e0c385;
+    --color-on-tertiary-fixed: #251a00;
+    --color-on-tertiary-fixed-variant: #584412;
+
+    /* ---- Base ---- */
+    --background: #faf9f6;
+    --foreground: #1b1c1a;
+
+    /* ---- Named / decorative colors ---- */
+    --color-parchment-white: #f5f4f1;
+    --color-slate-dark: #263238;
+    --color-gold-accent: #b69252;
+    --color-gold-highlight: #d0b477;
+    --color-success-green: #47875b;
+    --color-error-red: #b44c4c;
+
+    /* ---- Typography (Arabic-first: Tajawal display, Cairo body) ---- */
+    --font-display: var(--font-tajawal), "Cairo", ui-sans-serif, system-ui, sans-serif;
+    --font-body: var(--font-cairo), "Tajawal", ui-sans-serif, system-ui, sans-serif;
+    --font-decorative: var(--font-amiri), "Tajawal", serif;
+
+    --text-display-hero-size: 76px;
+    --text-display-hero-weight: 900;
+    --text-display-hero-line: 1.15;
+    --text-display-hero-tracking: -0.02em;
+
+    --text-display-hero-mobile-size: 42px;
+    --text-display-hero-mobile-weight: 900;
+    --text-display-hero-mobile-line: 1.2;
+    --text-display-hero-mobile-tracking: normal;
+
+    --text-headline-section-size: 45px;
+    --text-headline-section-weight: 700;
+    --text-headline-section-line: 1.35;
+
+    --text-headline-section-mobile-size: 30px;
+    --text-headline-section-mobile-weight: 700;
+    --text-headline-section-mobile-line: 1.35;
+
+    --text-title-card-size: 18px;
+    --text-title-card-weight: 700;
+    --text-title-card-line: 1.4;
+
+    --text-body-main-size: 16px;
+    --text-body-main-weight: 400;
+    --text-body-main-line: 1.8;
+
+    --text-body-small-size: 14px;
+    --text-body-small-weight: 400;
+    --text-body-small-line: 1.9;
+
+    --text-label-overline-size: 12px;
+    --text-label-overline-weight: 800;
+    --text-label-overline-line: 1.2;
+    --text-label-overline-tracking: 0.02em;
+    /* reduced from LTR 0.1em — wide tracking fragments Arabic joins */
+
+    --text-label-caption-size: 11px;
+    --text-label-caption-weight: 800;
+    --text-label-caption-line: 1.25;
+
+    /* ---- Radius ---- */
+    --radius-sm: 0.25rem;
+    --radius-DEFAULT: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+    --radius-full: 9999px;
+
+    /* Applied component radii, per the Civic Prestige shape language */
+    --radius-card: 14px;
+    --radius-interactive: 8px;
+    --radius-service-container: 22px;
+
+    /* ---- Spacing ---- */
+    --spacing-unit: 4px;
+    --spacing-gutter-sm: 12px;
+    --spacing-gutter-md: 20px;
+    --spacing-gutter-lg: 24px;
+    --spacing-section-v-desktop: 110px;
+    --spacing-section-v-mobile: 75px;
+    --spacing-container-max: 1200px;
+    --spacing-margin-tablet: 20px;
+    --spacing-margin-mobile: 16px;
+
+    /* ---- Elevation (Slate-tinted, not pure black) ---- */
+    --shadow-level-1: 0px 5px 20px rgba(38, 50, 56, 0.06);
+    --shadow-level-2: 0px 15px 40px rgba(38, 50, 56, 0.09);
+    --nav-blur: 18px;
+    --nav-bg-opacity: 0.9;
+
+    /* ---- Inputs ---- */
+    --color-input-bg: #eeece7;
+}
+
+/* ===========================================================
+    Dark theme — applied via .dark class (manual toggle) or
+    automatically via prefers-color-scheme when no class is set.
+    Deep slate foundation with the gold accent preserved for
+    brand continuity, per the design system's Dark Mode note.
+    =========================================================== */
+
+.dark {
+    color-scheme: dark;
+
+    --color-surface: #10171c;
+    --color-surface-dim: #10171c;
+    --color-surface-bright: #33393c;
+    --color-surface-container-lowest: #0a0f13;
+    --color-surface-container-low: #182025;
+    --color-surface-container: #1c2429;
+    --color-surface-container-high: #262e33;
+    --color-surface-container-highest: #31393d;
+    --color-surface-variant: #4e4639;
+
+    --color-on-surface: #f2f1ee;
+    --color-on-surface-variant: #d1c5b4;
+
+    --color-inverse-surface: #f2f1ee;
+    --color-inverse-on-surface: #2f312f;
+
+    --color-outline: #9a8f7d;
+    --color-outline-variant: #4e4639;
+
+    --color-surface-tint: #e9c17c;
+    --color-primary: #e9c17c;
+    --color-on-primary: #412c00;
+    --color-primary-container: #5d4207;
+    --color-on-primary-container: #ffdea9;
+    --color-inverse-primary: #77591f;
+
+    --color-secondary: #bbc8d0;
+    --color-on-secondary: #111d23;
+    --color-secondary-container: #3c494f;
+    --color-on-secondary-container: #d7e4ec;
+
+    --color-tertiary: #e0c385;
+    --color-on-tertiary: #251a00;
+    --color-tertiary-container: #584412;
+    --color-on-tertiary-container: #fedf9e;
+
+    --color-error: #ffb4ab;
+    --color-on-error: #690005;
+    --color-error-container: #93000a;
+    --color-on-error-container: #ffdad6;
+
+    --background: #10171c;
+    --foreground: #f2f1ee;
+
+    --color-input-bg: #1c2429;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+        color-scheme: dark;
+
+        --color-surface: #10171c;
+        --color-surface-dim: #10171c;
+        --color-surface-bright: #33393c;
+        --color-surface-container-lowest: #0a0f13;
+        --color-surface-container-low: #182025;
+        --color-surface-container: #1c2429;
+        --color-surface-container-high: #262e33;
+        --color-surface-container-highest: #31393d;
+        --color-surface-variant: #4e4639;
+
+        --color-on-surface: #f2f1ee;
+        --color-on-surface-variant: #d1c5b4;
+
+        --color-inverse-surface: #f2f1ee;
+        --color-inverse-on-surface: #2f312f;
+
+        --color-outline: #9a8f7d;
+        --color-outline-variant: #4e4639;
+
+        --color-surface-tint: #e9c17c;
+        --color-primary: #e9c17c;
+        --color-on-primary: #412c00;
+        --color-primary-container: #5d4207;
+        --color-on-primary-container: #ffdea9;
+        --color-inverse-primary: #77591f;
+
+        --color-secondary: #bbc8d0;
+        --color-on-secondary: #111d23;
+        --color-secondary-container: #3c494f;
+        --color-on-secondary-container: #d7e4ec;
+
+        --color-tertiary: #e0c385;
+        --color-on-tertiary: #251a00;
+        --color-tertiary-container: #584412;
+        --color-on-tertiary-container: #fedf9e;
+
+        --color-error: #ffb4ab;
+        --color-on-error: #690005;
+        --color-error-container: #93000a;
+        --color-on-error-container: #ffdad6;
+
+        --background: #10171c;
+        --foreground: #f2f1ee;
+
+        --color-input-bg: #1c2429;
+    }
+}
+
+/* ===========================================================
+    Tailwind v4 theme mapping
+    =========================================================== */
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    --color-surface: var(--color-surface);
+    --color-surface-dim: var(--color-surface-dim);
+    --color-surface-bright: var(--color-surface-bright);
+    --color-surface-container-lowest: var(--color-surface-container-lowest);
+    --color-surface-container-low: var(--color-surface-container-low);
+    --color-surface-container: var(--color-surface-container);
+    --color-surface-container-high: var(--color-surface-container-high);
+    --color-surface-container-highest: var(--color-surface-container-highest);
+    --color-surface-variant: var(--color-surface-variant);
+    --color-on-surface: var(--color-on-surface);
+    --color-on-surface-variant: var(--color-on-surface-variant);
+    --color-inverse-surface: var(--color-inverse-surface);
+    --color-inverse-on-surface: var(--color-inverse-on-surface);
+    --color-outline: var(--color-outline);
+    --color-outline-variant: var(--color-outline-variant);
+
+    --color-primary: var(--color-primary);
+    --color-on-primary: var(--color-on-primary);
+    --color-primary-container: var(--color-primary-container);
+    --color-on-primary-container: var(--color-on-primary-container);
+    --color-inverse-primary: var(--color-inverse-primary);
+    --color-primary-fixed: var(--color-primary-fixed);
+    --color-primary-fixed-dim: var(--color-primary-fixed-dim);
+    --color-on-primary-fixed: var(--color-on-primary-fixed);
+    --color-on-primary-fixed-variant: var(--color-on-primary-fixed-variant);
+
+    --color-secondary: var(--color-secondary);
+    --color-on-secondary: var(--color-on-secondary);
+    --color-secondary-container: var(--color-secondary-container);
+    --color-on-secondary-container: var(--color-on-secondary-container);
+    --color-secondary-fixed: var(--color-secondary-fixed);
+    --color-secondary-fixed-dim: var(--color-secondary-fixed-dim);
+    --color-on-secondary-fixed: var(--color-on-secondary-fixed);
+    --color-on-secondary-fixed-variant: var(--color-on-secondary-fixed-variant);
+
+    --color-tertiary: var(--color-tertiary);
+    --color-on-tertiary: var(--color-on-tertiary);
+    --color-tertiary-container: var(--color-tertiary-container);
+    --color-on-tertiary-container: var(--color-on-tertiary-container);
+    --color-tertiary-fixed: var(--color-tertiary-fixed);
+    --color-tertiary-fixed-dim: var(--color-tertiary-fixed-dim);
+    --color-on-tertiary-fixed: var(--color-on-tertiary-fixed);
+    --color-on-tertiary-fixed-variant: var(--color-on-tertiary-fixed-variant);
+
+    --color-error: var(--color-error);
+    --color-on-error: var(--color-on-error);
+    --color-error-container: var(--color-error-container);
+    --color-on-error-container: var(--color-on-error-container);
+
+    --color-gold-accent: var(--color-gold-accent);
+    --color-gold-highlight: var(--color-gold-highlight);
+    --color-slate-dark: var(--color-slate-dark);
+    --color-success-green: var(--color-success-green);
+    --color-error-red: var(--color-error-red);
+
+    --font-display: var(--font-display);
+    --font-body: var(--font-body);
+    --font-decorative: var(--font-decorative);
+
+    --radius-sm: var(--radius-sm);
+    --radius-DEFAULT: var(--radius-DEFAULT);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+    --radius-xl: var(--radius-xl);
+    --radius-full: var(--radius-full);
+}
+
+/* ===========================================================
+    Base styles
+    =========================================================== */
+
+* {
+    border-color: var(--color-outline-variant);
+}
+
+*::selection {
+    background-color: var(--color-primary-fixed-dim, #e9c17c);
+    color: var(--color-on-primary-fixed, #271900);
+}
+
+html {
+    direction: rtl;
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    direction: rtl;
+    text-align: right;
+    transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+        color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-display);
+}
+
+/* Cultural/traditional emphasis face — used sparingly, never for UI labels */
+.font-decorative {
+    font-family: var(--font-decorative);
+    font-style: italic;
+}
+
+/* Utility classes for the typography scale */
+.text-display-hero {
+    font-family: var(--font-display);
+    font-size: var(--text-display-hero-size);
+    font-weight: var(--text-display-hero-weight);
+    line-height: var(--text-display-hero-line);
+    letter-spacing: var(--text-display-hero-tracking);
+}
+
+@media (max-width: 768px) {
+    .text-display-hero {
+        font-size: var(--text-display-hero-mobile-size);
+        font-weight: var(--text-display-hero-mobile-weight);
+        line-height: var(--text-display-hero-mobile-line);
+        letter-spacing: var(--text-display-hero-mobile-tracking);
+    }
+}
+
+.text-headline-section {
+    font-family: var(--font-display);
+    font-size: var(--text-headline-section-size);
+    font-weight: var(--text-headline-section-weight);
+    line-height: var(--text-headline-section-line);
+}
+
+@media (max-width: 768px) {
+    .text-headline-section {
+        font-size: var(--text-headline-section-mobile-size);
+        font-weight: var(--text-headline-section-mobile-weight);
+        line-height: var(--text-headline-section-mobile-line);
+    }
+}
+
+.text-title-card {
+    font-family: var(--font-display);
+    font-size: var(--text-title-card-size);
+    font-weight: var(--text-title-card-weight);
+    line-height: var(--text-title-card-line);
+}
+
+.text-body-main {
+    font-family: var(--font-body);
+    font-size: var(--text-body-main-size);
+    font-weight: var(--text-body-main-weight);
+    line-height: var(--text-body-main-line);
+}
+
+.text-body-small {
+    font-family: var(--font-body);
+    font-size: var(--text-body-small-size);
+    font-weight: var(--text-body-small-weight);
+    line-height: var(--text-body-small-line);
+}
+
+.text-label-overline {
+    font-family: var(--font-display);
+    font-size: var(--text-label-overline-size);
+    font-weight: var(--text-label-overline-weight);
+    line-height: var(--text-label-overline-line);
+    letter-spacing: var(--text-label-overline-tracking);
+    color: var(--color-primary);
+}
+
+.text-label-caption {
+    font-family: var(--font-display);
+    font-size: var(--text-label-caption-size);
+    font-weight: var(--text-label-caption-weight);
+    line-height: var(--text-label-caption-line);
+}
+
+/* Card + elevation helpers */
+.card {
+    background: var(--color-surface-container-lowest);
+    border-radius: var(--radius-card);
+    padding: 24px;
+    box-shadow: var(--shadow-level-1);
+    transition: box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
+        transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-level-2);
+    transform: translateY(-2px);
+}
+
+.card .icon {
+    color: var(--color-gold-accent);
+}
+
+/* Section title pattern: overline + headline + offset divider (RTL: offset right) */
+.section-title .divider {
+    width: 64px;
+    height: 1px;
+    background: var(--color-primary);
+    margin-inline-end: 0;
+    margin-inline-start: auto;
+}
+
+/* Buttons */
+.btn-primary {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border: none;
+    border-radius: var(--radius-interactive);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-level-1);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--color-on-surface);
+    border: 1px solid var(--color-outline);
+    border-radius: var(--radius-interactive);
+}
+
+/* Inputs */
+.input-field {
+    background: var(--color-input-bg);
+    border: 1px solid transparent;
+    border-radius: var(--radius-interactive);
+    text-align: right;
+}
+
+.input-field:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(182, 146, 82, 0.25);
+}
+
+/* Service containers (large citizen-interaction zones) */
+.service-container {
+    border-radius: var(--radius-service-container);
+}
+
+/* Navigation */
+.nav {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(var(--nav-blur));
+    background: color-mix(in srgb, var(--color-surface) calc(var(--nav-bg-opacity) * 100%), transparent);
+}
+
+.nav-link {
+    font-family: var(--font-display);
+    font-size: var(--text-label-overline-size);
+    font-weight: var(--text-label-overline-weight);
+    line-height: var(--text-label-overline-line);
+    position: relative;
+}
+
+.nav-link.active::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    right: 50%;
+    left: 50%;
+    height: 2px;
+    background: var(--color-primary);
+    transition: right 200ms ease, left 200ms ease;
+}
+
+.nav-link.active:hover::after {
+    right: 0;
+    left: 0;
+}
+
+.wrapper {
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 1rem);
+    width: 100%;
+    max-width: clamp(320px, 92vw, var(--spacing-container-max));
+}
