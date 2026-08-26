@@ -2,12 +2,10 @@
 "use client";
 
 import { useState } from "react";
-import { User, Landmark, Share2, MapPin, Phone, MessageCircle, Link as LinkIcon, Camera, Trash2 } from "lucide-react";
+import { User, Landmark, Share2, MapPin, Phone, MessageCircle, Link as LinkIcon, Camera, Trash2, Calendar, Clock, Home } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/hero-management-dashboard-page/Pageheader";
 import { Field, InputWithIcon, SectionCard, TextareaField } from "@/components/dashboard/hero-management-dashboard-page/Formfield";
 import { SaveBar } from "@/components/dashboard/hero-management-dashboard-page/Savebar";
-
-
 
 export default function HeroManagementDashboardPage() {
     const [saving, setSaving] = useState(false);
@@ -86,6 +84,16 @@ export default function HeroManagementDashboardPage() {
                         </Field>
                     </div>
 
+                    {/* الحقول الجديدة: تاريخ الميلاد ومحل الإقامة */}
+                    <div className="grid md:grid-cols-2 gap-5">
+                        <Field label="تاريخ الميلاد">
+                            <InputWithIcon type="date" defaultValue="1980-01-15" icon={<Calendar size={16} />} />
+                        </Field>
+                        <Field label="محل إقامة النائب">
+                            <InputWithIcon defaultValue="الجيزة - جمهورية مصر العربية" icon={<Home size={16} />} />
+                        </Field>
+                    </div>
+
                     <Field label="نبذة مختصرة (تظهر في الواجهة)">
                         <TextareaField
                             rows={2}
@@ -122,6 +130,14 @@ export default function HeroManagementDashboardPage() {
                             <InputWithIcon type="date" defaultValue="2021-10-01" />
                         </Field>
                     </div>
+
+                    {/* الحقل الجديد: مواعيد العمل لاستقبال المواطنين */}
+                    <Field label="مواعيد واستقبال المواطنين (Work Appointment)">
+                        <InputWithIcon
+                            defaultValue="الأحد والأربعاء من الساعة 5 مساءً حتى 9 مساءً"
+                            icon={<Clock size={16} />}
+                        />
+                    </Field>
 
                     <Field label="عنوان المقر الرئيسي لخدمة المواطنين">
                         <InputWithIcon defaultValue="شارع الهرم الرئيسي، بجوار مبنى المحافظة القديم، الجيزة" />
@@ -165,6 +181,5 @@ export default function HeroManagementDashboardPage() {
                 saving={saving}
             />
         </>
-
     );
 }

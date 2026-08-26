@@ -5,14 +5,18 @@ import {
     CalendarDays,
     Settings,
     Video,
-    FileText, // استيراد أيقونة طلبات الإحاطة
+    FileText,
+    CalendarCheck,
+    CheckCircle2,
+    Users, // أيقونة قسم فريق العمل
 } from "lucide-react";
 
 export const NAV_ITEMS_DASH = [
     { href: "/", label: "نظرة عامة", icon: LayoutGrid },
-    { href: "/site-management", label: "إدارة الموقع", icon: FolderCog },
-    { href: "/requests", label: "الشكاوى والطلبات", icon: MessagesSquare },
-    { href: "/briefing-requests", label: "طلبات الإحاطة", icon: FileText }, // رابط طلبات الإحاطة الجديد
+    { href: "/briefing-requests", label: "طلبات الإحاطة", icon: FileText },
+    { href: "/achievements", label: "ما تم إنجازه", icon: CheckCircle2 },
+    { href: "/team", label: "فريق العمل", icon: Users }, // رابط قسم فريق مكتب النائب الجديد
+    { href: "/events", label: "أحدث الزيارات والفعاليات", icon: CalendarCheck },
     { href: "/activities", label: "الأنشطة والفعاليات", icon: CalendarDays },
     { href: "/videos", label: "اللقاءات والفيديوهات", icon: Video },
     { href: "/settings", label: "الإعدادات", icon: Settings },

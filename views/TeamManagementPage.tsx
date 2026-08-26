@@ -2,45 +2,64 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { ActivityItem, ActivityItemRow } from "@/components/dashboard/activities-management-dashboard-page/Activityitemrow";
 import { PageHeader } from "@/components/dashboard/hero-management-dashboard-page/Pageheader";
 import { SaveBar } from "@/components/dashboard/hero-management-dashboard-page/Savebar";
-import { ActivityModal } from "@/modals/Activitymodal";
 import ConfirmDialog from "@/components/ui/Confirmdialog";
+import { TeamModal } from "@/modals/TeamModal";
+import { TeamItem, TeamItemRow } from "@/components/dashboard/team-management-dashboard-page/TeamItemRow";
 
-const INITIAL_ITEMS: ActivityItem[] = [
+const INITIAL_TEAM: TeamItem[] = [
     {
-        id: "health",
+        id: "1",
         order: 1,
-        title: "الخدمات الصحية",
-        description: "متابعة الملفات الصحية ودعم المواطنين في الحصول على الخدمات الطبية.",
-        imageUrl: "/images/activities/health.jpg",
+        name: "الأستاذ رفعت",
+        role: "مسؤول متابعة طلبات الوزارات والمحافظة والإدارات التابعة لها.",
+        phone: "01036200117",
     },
     {
-        id: "sports",
+        id: "2",
         order: 2,
-        title: "الرياضة ودعم الشباب",
-        description: "دعم الرياضة والمؤسسات الرياضية وتكريم الفائزين بالبطولات.",
-        imageUrl: "/images/activities/sports.jpg",
+        name: "الأستاذة إيمان",
+        role: "مسؤولة ملف الصحة بمستشفى كفر شكر، ومعهد أورام ميت غمر، وملف الكشف الطبي لبرنامج تكافل وكرامة.",
+        phone: "01065932503",
     },
     {
-        id: "charity",
+        id: "3",
         order: 3,
-        title: "العمل الخيري",
-        description: "مبادرات مجتمعية وخدمات تستهدف أبناء الدائرة والأسر الأكثر احتياجاً.",
-        imageUrl: "/images/activities/charity.jpg",
+        name: "الأستاذ محمود",
+        role: "مسؤول ملف الصحة بمستشفيات: بنها الجامعي، التأمين الصحي، الحميات، بنها التعليمي.",
+        phone: "01558844165",
+    },
+    {
+        id: "4",
+        order: 4,
+        name: "الأستاذ ماهر",
+        role: "مسؤول السوشيال ميديا والصفحة الرسمية، واستقبال شكاوى المواطنين عبر الصفحة.",
+        phone: "01114418110",
+    },
+    {
+        id: "5",
+        order: 5,
+        name: "الأستاذ أحمد",
+        role: "مسؤول متابعة شكاوى الملف الصحي.",
+        phone: "01010987021",
+    },
+    {
+        id: "6",
+        order: 6,
+        name: "مكتب النائب",
+        role: "للشكاوى والاتصالات والرسائل الخاصة بالمكتب.",
+        phone: "01024949496",
+        availableHours: "يومياً من 1:00 ظهراً حتى 10:00 مساءً",
     },
 ];
 
-export default function ActivitiesManagementPage() {
-    const [items, setItems] = useState<ActivityItem[]>(INITIAL_ITEMS);
+export default function TeamManagementPage() {
+    const [team, setTeam] = useState<TeamItem[]>(INITIAL_TEAM);
     const [saving, setSaving] = useState(false);
 
-    // حالة التحكم بـ ActivityModal
     const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
-    const [activeItem, setActiveItem] = useState<ActivityItem | undefined>(undefined);
-
-    // حالة التحكم بـ ConfirmDialog الخاص بالحذف
+    const [activeItem, setActiveItem] = useState<TeamItem | undefined>(undefined);
     const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
 
     const openAddModal = () => {
@@ -48,7 +67,7 @@ export default function ActivitiesManagementPage() {
         setModalMode("add");
     };
 
-    const openEditModal = (item: ActivityItem) => {
+    const openEditModal = (item: TeamItem) => {
         setActiveItem(item);
         setModalMode("edit");
     };
@@ -64,7 +83,7 @@ export default function ActivitiesManagementPage() {
 
     const handleConfirmRemove = () => {
         if (!deletingItemId) return;
-        setItems((prev) =>
+        setTeam((prev) =>
             prev
                 .filter((item) => item.id !== deletingItemId)
                 .map((item, index) => ({ ...item, order: index + 1 }))
@@ -72,8 +91,8 @@ export default function ActivitiesManagementPage() {
         setDeletingItemId(null);
     };
 
-    const handleModalSave = (item: Omit<ActivityItem, "order">) => {
-        setItems((prev) => {
+    const handleModalSave = (item: Omit<TeamItem, "order">) => {
+        setTeam((prev) => {
             const exists = prev.some((p) => p.id === item.id);
             if (exists) {
                 return prev.map((p) => (p.id === item.id ? { ...p, ...item } : p));
@@ -87,36 +106,36 @@ export default function ActivitiesManagementPage() {
         setTimeout(() => setSaving(false), 900);
     };
 
-    const targetDeleteItem = items.find((item) => item.id === deletingItemId);
+    const targetDeleteItem = team.find((item) => item.id === deletingItemId);
 
     return (
         <>
             <PageHeader
                 breadcrumb="إدارة الموقع"
-                title="الأنشطة والفعاليات"
+                title="فريق مكتب النائب"
                 lastSavedLabel="آخر حفظ: منذ دقيقة"
             />
 
             <div className="flex-1 flex flex-col gap-6 px-6 md:px-10 pb-6">
                 <section className="card">
                     <div className="flex items-center justify-between mb-1">
-                        <h2 className="text-title-card text-on-surface">قائمة مجالات العمل والأنشطة ({items.length})</h2>
+                        <h2 className="text-title-card text-on-surface">أعضاء الفريق ({team.length})</h2>
                         <button
                             type="button"
                             onClick={openAddModal}
                             className="btn-outline flex items-center gap-2 px-4 py-2 text-body-small font-semibold"
                         >
                             <Plus size={15} />
-                            <span>إضافة مجال جديد</span>
+                            <span>إضافة عضو جديد</span>
                         </button>
                     </div>
                     <p className="text-body-small text-on-surface-variant mb-5">
-                        قم بإدارة بطاقات مجالات العمل والأنشطة التي تظهر في الواجهة الرئيسية للموقع.
+                        إدارة فريق الخدمات ومسؤولي المتابعة للتواصل مع المواطنين حسب نوع الطلب.
                     </p>
 
                     <div className="flex flex-col gap-3">
-                        {items.map((item) => (
-                            <ActivityItemRow
+                        {team.map((item) => (
+                            <TeamItemRow
                                 key={item.id}
                                 item={item}
                                 onEdit={openEditModal}
@@ -124,9 +143,9 @@ export default function ActivitiesManagementPage() {
                             />
                         ))}
 
-                        {items.length === 0 && (
+                        {team.length === 0 && (
                             <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
-                                لا توجد مجالات مضافة بعد. ابدأ بإضافة أول مجال عمل.
+                                لا يوجد أعضاء مضافين في الفريق حالياً.
                             </div>
                         )}
                     </div>
@@ -136,11 +155,11 @@ export default function ActivitiesManagementPage() {
             <SaveBar
                 helperText="التغييرات تظهر في الموقع فور الحفظ."
                 onSave={handleSave}
-                onDiscard={() => setItems(INITIAL_ITEMS)}
+                onDiscard={() => setTeam(INITIAL_TEAM)}
                 saving={saving}
             />
 
-            <ActivityModal
+            <TeamModal
                 open={modalMode !== null}
                 initialItem={activeItem}
                 onClose={closeModal}
@@ -149,10 +168,10 @@ export default function ActivitiesManagementPage() {
 
             <ConfirmDialog
                 open={deletingItemId !== null}
-                title="حذف مجال العمل"
+                title="حذف العضو"
                 description={
                     <span>
-                        هل أنت تأكد من حذف مجال <strong>&quot;{targetDeleteItem?.title}&quot;</strong>؟ لا يمكنك التراجع عن هذه الخطوة.
+                        هل أنت تأكد من حذف <strong>&quot;{targetDeleteItem?.name}&quot;</strong> من فريق العمل؟
                     </span>
                 }
                 confirmLabel="حذف"

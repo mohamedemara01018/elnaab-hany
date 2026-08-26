@@ -11,7 +11,7 @@ import { NAV_ITEMS_DASH } from '@/utils/constant.utils';
 function HomePage() {
     const role = 'admin'
     switch (role) {
-        case 'admikn':
+        case 'admin':
             return <DashboardLayout userName="أدمن هاني شحاتة" userRole="المسؤول" NAV_ITEMS={NAV_ITEMS_DASH}>
                 <HeroManagementDashboardPage />
             </DashboardLayout>

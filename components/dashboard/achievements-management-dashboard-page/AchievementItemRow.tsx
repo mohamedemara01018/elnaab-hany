@@ -3,25 +3,25 @@
 
 import { Edit2, Trash2, Image as ImageIcon } from "lucide-react";
 
-export type BriefingRequestItem = {
+export type AchievementItem = {
     id: string;
     order: number;
     title: string;
     description: string;
-    imageUrl: string;
+    imageUrl?: string;
 };
 
-type BriefingRequestItemRowProps = {
-    item: BriefingRequestItem;
-    onEdit: (item: BriefingRequestItem) => void;
+type AchievementItemRowProps = {
+    item: AchievementItem;
+    onEdit: (item: AchievementItem) => void;
     onRemove: (id: string) => void;
 };
 
-export function BriefingRequestItemRow({ item, onEdit, onRemove }: BriefingRequestItemRowProps) {
+export function AchievementItemRow({ item, onEdit, onRemove }: AchievementItemRowProps) {
     return (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-outline-variant bg-surface hover:border-primary/50 transition-colors">
             <div className="flex items-center gap-4 min-w-0">
-                {/* Media Preview Thumbnail */}
+                {/* Image Thumbnail */}
                 <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-surface-container-high border border-outline-variant flex items-center justify-center shrink-0">
                     {item.imageUrl ? (
                         <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
@@ -51,7 +51,7 @@ export function BriefingRequestItemRow({ item, onEdit, onRemove }: BriefingReque
                 <button
                     type="button"
                     onClick={() => onEdit(item)}
-                    aria-label="تعديل طلب الإحاطة"
+                    aria-label="تعديل الإنجاز"
                     className="p-2 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-interactive transition-colors"
                     title="تعديل"
                 >
@@ -60,7 +60,7 @@ export function BriefingRequestItemRow({ item, onEdit, onRemove }: BriefingReque
                 <button
                     type="button"
                     onClick={() => onRemove(item.id)}
-                    aria-label="حذف طلب الإحاطة"
+                    aria-label="حذف الإنجاز"
                     className="p-2 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-interactive transition-colors"
                     title="حذف"
                 >
