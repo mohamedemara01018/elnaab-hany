@@ -1,88 +1,122 @@
-import { AlertTriangle, X } from "lucide-react";
+"use client";
 
-interface ConfirmDialogProps {
+import { useEffect, type ReactNode } from "react";
+import { AlertTriangle, HelpCircle, X } from "lucide-react";
+
+type ConfirmDialogProps = {
     open: boolean;
     title: string;
-    description: string;
-    confirmLabel: string;
-    tone?: "danger" | "default";
-    confirmingCount?: number;
+    description?: ReactNode;
+    confirmLabel?: string;
+    cancelLabel?: string;
+    variant?: "danger" | "default";
+    loading?: boolean;
     onConfirm: () => void;
-    onCancel: () => void;
-    isLoading?: boolean;
-}
+    onClose: () => void;
+};
 
-function ConfirmDialog({
+export default function ConfirmDialog({
     open,
     title,
     description,
-    confirmLabel,
-    tone = "danger",
-    confirmingCount,
+    confirmLabel = "تأكيد",
+    cancelLabel = "إلغاء",
+    variant = "default",
+    loading = false,
     onConfirm,
-    onCancel,
-    isLoading = false,
+    onClose,
 }: ConfirmDialogProps) {
+    const isDanger = variant === "danger";
+
+    // Close on Escape
+    useEffect(() => {
+        if (!open) return;
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && !loading) onClose();
+        };
+        document.addEventListener("keydown", handleKey);
+        return () => document.removeEventListener("keydown", handleKey);
+    }, [open, loading, onClose]);
+
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div
+            dir="rtl"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="confirm-dialog-title"
+        >
             {/* Backdrop */}
             <button
-                aria-label="Close dialog"
-                onClick={onCancel}
-                className="absolute inset-0 bg-inverse-surface/40"
+                type="button"
+                aria-label="إغلاق"
+                onClick={() => !loading && onClose()}
+                className="absolute inset-0 bg-slate-dark/50 backdrop-blur-[2px]"
             />
 
-            <div className="relative bg-surface-container-high rounded-lg shadow-(--shadow-level-3) w-full max-w-110 p-6">
-                <button
-                    onClick={onCancel}
-                    aria-label="Close"
-                    className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface transition-colors"
-                >
-                    <X size={18} />
-                </button>
-
-                <span
-                    className={`w-11 h-11 rounded-full flex items-center justify-center ${tone === "danger"
-                        ? "bg-error-container text-on-error-container"
-                        : "bg-primary/10 text-primary"
-                        }`}
-                >
-                    <AlertTriangle size={22} />
-                </span>
-
-                <h2 className="text-headline-md text-on-surface mt-4">{title}</h2>
-                <p className="text-body-md text-on-surface-variant mt-2 leading-relaxed">
-                    {description}
-                    {confirmingCount && confirmingCount > 1 && (
-                        <span className="block mt-1 font-medium text-on-surface">
-                            This will affect {confirmingCount} selected users.
+            {/* Dialog */}
+            <div className="relative w-full max-w-sm rounded-card bg-surface-container-lowest border border-outline-variant shadow-level-2">
+                <div className="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
+                    <div className="flex items-start gap-3">
+                        <span
+                            className={[
+                                "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
+                                isDanger
+                                    ? "bg-error-container text-error"
+                                    : "bg-secondary-container text-secondary",
+                            ].join(" ")}
+                        >
+                            {isDanger ? <AlertTriangle size={17} /> : <HelpCircle size={17} />}
                         </span>
-                    )}
-                </p>
-
-                <div className="flex items-center justify-end gap-3 mt-6">
+                        <h2
+                            id="confirm-dialog-title"
+                            className="text-title-card text-on-surface pt-1"
+                            style={{ fontSize: 18 }}
+                        >
+                            {title}
+                        </h2>
+                    </div>
                     <button
-                        onClick={onCancel}
-                        className="text-label-md text-on-surface border border-outline-variant rounded-md px-5 py-2.5 hover:bg-surface-container-low transition-colors"
+                        type="button"
+                        onClick={onClose}
+                        disabled={loading}
+                        aria-label="إغلاق"
+                        className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50"
                     >
-                        Cancel
+                        <X size={16} />
+                    </button>
+                </div>
+
+                {description && (
+                    <div className="px-6 pb-5 ps-[3.75rem]">
+                        <p className="text-body-main text-on-surface-variant">{description}</p>
+                    </div>
+                )}
+
+                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant bg-surface-container-low rounded-b-card">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={loading}
+                        className="btn-outline px-5 py-2.5 text-body-main disabled:opacity-50"
+                    >
+                        {cancelLabel}
                     </button>
                     <button
+                        type="button"
                         onClick={onConfirm}
-                        disabled={isLoading}
-                        className={`text-label-md rounded-md px-5 py-2.5 transition-opacity hover:opacity-90 disabled:opacity-60 ${tone === "danger"
-                            ? "bg-error text-on-error"
-                            : "bg-primary text-on-primary"
-                            }`}
+                        disabled={loading}
+                        className={[
+                            "px-5 py-2.5 text-body-main font-semibold rounded-interactive transition-colors disabled:opacity-60",
+                            isDanger ? "bg-error text-on-error hover:opacity-90" : "btn-primary",
+                        ].join(" ")}
                     >
-                        {isLoading ? "Please wait…" : confirmLabel}
+                        {loading ? "جارِ التنفيذ..." : confirmLabel}
                     </button>
                 </div>
             </div>
         </div>
     );
 }
-
-export default ConfirmDialog;

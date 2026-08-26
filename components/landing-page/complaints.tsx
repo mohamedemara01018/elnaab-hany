@@ -10,7 +10,7 @@ export function Complaints() {
   const [formTab, setFormTab] = useState<"complaint" | "proposal">("complaint");
 
   return (
-    <Section id="complaints">
+    <Section id="complaints" className="bg-surface-container-low">
       <div className="max-w-2xl mx-auto">
         <motion.div
           variants={fadeUp}

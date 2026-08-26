@@ -1,8 +1,6 @@
 "use client";
 
-import "../app/globals.css";
 
-import { Navbar } from "@/components/landing-page/navbar";
 import { Hero } from "@/components/landing-page/hero";
 import { About } from "@/components/landing-page/about";
 import { Stats } from "@/components/landing-page/stats";
@@ -13,11 +11,11 @@ import { Gallery } from "@/components/landing-page/gallery";
 import { Achievements } from "@/components/landing-page/achievements";
 import { Complaints } from "@/components/landing-page/complaints";
 import { Contact } from "@/components/landing-page/contact";
-import { Footer } from "@/components/landing-page/footer";
+import PublicLayout from "@/components/layout/public/PublicLayout";
 
 export default function LandingPage() {
     return (
-        <div className="bg-background text-foreground min-h-screen">
+        <PublicLayout>
             <Hero />
             <About />
             <Stats />
@@ -28,6 +26,6 @@ export default function LandingPage() {
             <Achievements />
             <Complaints />
             <Contact />
-        </div>
+        </PublicLayout>
     );
 }

@@ -1,10 +1,19 @@
-export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+import {
+    LayoutGrid,
+    FolderCog,
+    MessagesSquare,
+    CalendarDays,
+    Settings,
+    Video,
+    FileText, // استيراد أيقونة طلبات الإحاطة
+} from "lucide-react";
 
-export const DURATION = 4000
-
-export const MAX_IMG_SIZE = 1 * 1024 * 1024; // 5MB
-
-export const ALLOWED_IMG_TYPES = [
-    "image/jpeg",
-    "image/png",
+export const NAV_ITEMS_DASH = [
+    { href: "/", label: "نظرة عامة", icon: LayoutGrid },
+    { href: "/site-management", label: "إدارة الموقع", icon: FolderCog },
+    { href: "/requests", label: "الشكاوى والطلبات", icon: MessagesSquare },
+    { href: "/briefing-requests", label: "طلبات الإحاطة", icon: FileText }, // رابط طلبات الإحاطة الجديد
+    { href: "/activities", label: "الأنشطة والفعاليات", icon: CalendarDays },
+    { href: "/videos", label: "اللقاءات والفيديوهات", icon: Video },
+    { href: "/settings", label: "الإعدادات", icon: Settings },
 ];

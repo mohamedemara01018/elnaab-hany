@@ -1,9 +1,8 @@
-import LandingPage from '@/views/LandingPage'
-import React from 'react'
+import HomePage from '@/views/HomePage'
 
 function page() {
   return (
-    <LandingPage />
+    <HomePage />
   )
 }
 

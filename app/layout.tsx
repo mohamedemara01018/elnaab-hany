@@ -3,8 +3,6 @@ import { Tajawal, Cairo, Amiri } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "@/provider/StoreProvider";
 import ToastificationProvider from "@/provider/ToastificationProvider";
-import { Navbar } from "@/components/landing-page/navbar";
-import { Footer } from "@/components/landing-page/footer";
 
 const tajawal = Tajawal({
   subsets: ["arabic"],
@@ -80,20 +78,16 @@ export default function RootLayout({
   return (
     <html dir="rtl" lang="ar" suppressHydrationWarning className="light">
       <head>
-        {/* Prevent dark-mode flash on load */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var m=localStorage.getItem('theme');if(m==='dark'||(!m&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();`,
           }}
         />
-
       </head>
       <body className={`${tajawal.variable} ${cairo.variable} ${amiri.variable} min-h-full flex flex-col transition-colors duration-200 antialiased`}>
         <StoreProvider>
           <ToastificationProvider>
-            <Navbar />
             {children}
-            <Footer />
           </ToastificationProvider>
         </StoreProvider>
       </body>

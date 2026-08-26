@@ -10,7 +10,7 @@ import img from '@/public/721082606_122225076506346497_7612991756831435743_n.jpg
 import Image from "next/image";
 export function About() {
   return (
-    <Section id="about">
+    <Section id="about" className="bg-surface-container-low">
       <SectionTitle eyebrow="من نحن" title="السيرة" emphasis="الذاتية" />
 
       <motion.div

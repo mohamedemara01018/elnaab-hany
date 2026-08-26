@@ -42,7 +42,7 @@ export function Footer() {
       </div>
 
       <div className="text-center mt-10">
-        <a href="#" className="text-gold-highlight text-sm" aria-label="دخول الإدارة">
+        <a href="login" className="text-gold-highlight text-sm" aria-label="دخول الإدارة">
           دخول الإدارة ←
         </a>
       </div>

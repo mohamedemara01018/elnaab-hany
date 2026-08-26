@@ -9,7 +9,7 @@ import { fadeUp, staggerContainer, revealViewport } from "@/lib/motion-variants"
 
 export function Gallery() {
   return (
-    <Section id="gallery">
+    <Section id="gallery" className="bg-surface-container-low">
       <SectionTitle eyebrow="من الميدان" title="أحدث" emphasis="الزيارات والفعاليات" />
 
       <motion.div
