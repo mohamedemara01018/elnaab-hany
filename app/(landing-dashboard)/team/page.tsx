@@ -1,4 +1,4 @@
-import TeamManagementPage from '@/views/TeamManagementPage'
+import TeamManagementPage from '@/views/landing-dashboard/TeamManagementPage'
 import React from 'react'
 
 function page() {

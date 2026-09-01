@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Plus, FileText } from "lucide-react";
 import { BriefingRequestModal } from "@/modals/BriefingRequestModal";
 import ConfirmDialog from "@/components/ui/Confirmdialog";
-import { BriefingRequestItem, BriefingRequestItemRow } from "@/components/dashboard/briefing-requests-dashboard-page/BriefingRequestItemRow";
-import { Field, InputWithIcon, SectionCard, TextareaField } from "@/components/dashboard/hero-management-dashboard-page/Formfield";
-import { PageHeader } from "@/components/dashboard/hero-management-dashboard-page/Pageheader";
-import { SaveBar } from "@/components/dashboard/hero-management-dashboard-page/Savebar";
+import { BriefingRequestItem, BriefingRequestItemRow } from "@/components/landing-dashboard/briefing-requests-dashboard-page/BriefingRequestItemRow";
+import { Field, InputWithIcon, SectionCard, TextareaField } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
+import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
+import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
 
 const INITIAL_ITEMS: BriefingRequestItem[] = [
     {

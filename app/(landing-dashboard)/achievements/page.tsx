@@ -1,4 +1,4 @@
-import AchievementsManagementPage from '@/views/AchievementsManagementPage'
+import AchievementsManagementPage from '@/views/landing-dashboard/AchievementsManagementPage'
 import React from 'react'
 
 function page() {

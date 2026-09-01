@@ -1,4 +1,4 @@
-import VideosManagementPage from '@/views/VideosManagementPage'
+import VideosManagementPage from '@/views/landing-dashboard/VideosManagementPage'
 import React from 'react'
 
 function page() {

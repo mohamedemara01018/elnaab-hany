@@ -5,9 +5,9 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 
 import ConfirmDialog from "@/components/ui/Confirmdialog";
-import { VideoItem, VideoItemRow } from "@/components/dashboard/video-management-dashboard-page/VideoItemRow";
-import { SaveBar } from "@/components/dashboard/hero-management-dashboard-page/Savebar";
-import { PageHeader } from "@/components/dashboard/hero-management-dashboard-page/Pageheader";
+import { VideoItem, VideoItemRow } from "@/components/landing-dashboard/video-management-dashboard-page/VideoItemRow";
+import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
+import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
 import { VideoModal } from "@/modals/VideoModal";
 
 const INITIAL_VIDEOS: VideoItem[] = [

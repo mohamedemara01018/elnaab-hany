@@ -3,9 +3,9 @@
 
 import { useState } from "react";
 import { User, Landmark, Share2, MapPin, Phone, MessageCircle, Link as LinkIcon, Camera, Trash2, Calendar, Clock, Home } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/hero-management-dashboard-page/Pageheader";
-import { Field, InputWithIcon, SectionCard, TextareaField } from "@/components/dashboard/hero-management-dashboard-page/Formfield";
-import { SaveBar } from "@/components/dashboard/hero-management-dashboard-page/Savebar";
+import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
+import { Field, InputWithIcon, SectionCard, TextareaField } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
+import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
 
 export default function HeroManagementDashboardPage() {
     const [saving, setSaving] = useState(false);

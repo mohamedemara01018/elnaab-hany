@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Upload, Calendar, MapPin, Play, Image as ImageIcon } from "lucide-react";
-import { EventItem } from "@/components/dashboard/event-management-dashboard-page/EventsItemRow";
+import { EventItem } from "@/components/landing-dashboard/event-management-dashboard-page/EventsItemRow";
 
 interface EventModalProps {
     open: boolean;

@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { X, Upload, Image as ImageIcon, Trash2 } from "lucide-react";
-import { AchievementItem } from "@/components/dashboard/achievements-management-dashboard-page/AchievementItemRow";
+import { AchievementItem } from "@/components/landing-dashboard/achievements-management-dashboard-page/AchievementItemRow";
 
 interface AchievementModalProps {
     open: boolean;

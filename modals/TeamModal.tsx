@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { X, Upload, User, Trash2 } from "lucide-react";
-import { TeamItem } from "@/components/dashboard/team-management-dashboard-page/TeamItemRow";
+import { TeamItem } from "@/components/landing-dashboard/team-management-dashboard-page/TeamItemRow";
 
 interface TeamModalProps {
     open: boolean;

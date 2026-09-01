@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { X, Upload, Video as VideoIcon, Link as LinkIcon } from "lucide-react";
-import { Field, InputWithIcon } from "@/components/dashboard/hero-management-dashboard-page/Formfield";
-import { VideoItem } from "@/components/dashboard/video-management-dashboard-page/VideoItemRow";
+import { Field, InputWithIcon } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
+import { VideoItem } from "@/components/landing-dashboard/video-management-dashboard-page/VideoItemRow";
 
 type ModalProps = {
     open: boolean;

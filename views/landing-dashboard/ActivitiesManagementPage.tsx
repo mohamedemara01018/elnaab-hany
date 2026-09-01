@@ -2,42 +2,45 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { PageHeader } from "@/components/dashboard/hero-management-dashboard-page/Pageheader";
-import { SaveBar } from "@/components/dashboard/hero-management-dashboard-page/Savebar";
+import { ActivityItem, ActivityItemRow } from "@/components/landing-dashboard/activities-management-dashboard-page/Activityitemrow";
+import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
+import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
+import { ActivityModal } from "@/modals/Activitymodal";
 import ConfirmDialog from "@/components/ui/Confirmdialog";
-import { AchievementModal } from "@/modals/AchievementModal";
-import { AchievementItem, AchievementItemRow } from "@/components/dashboard/achievements-management-dashboard-page/AchievementItemRow";
 
-const INITIAL_ITEMS: AchievementItem[] = [
+const INITIAL_ITEMS: ActivityItem[] = [
     {
-        id: "1",
+        id: "health",
         order: 1,
-        title: "تجهيز مستشفي كفر شكر بالعلاج البيولوجي",
-        description: "توفير العلاج البيولوجي إلي مستشفي كفر شكر التخصصي تضامناً مع المرضي تسهيلاً عليهم الانتقالات.",
-        imageUrl: "",
+        title: "الخدمات الصحية",
+        description: "متابعة الملفات الصحية ودعم المواطنين في الحصول على الخدمات الطبية.",
+        imageUrl: "/images/activities/health.jpg",
     },
     {
-        id: "2",
+        id: "sports",
         order: 2,
-        title: "تجديد خطوط الصرف الصحي بقرية المنشأة الكبرى",
-        description: "الحرص علي سلامة المواطنين تم تجديد الصرف الصحي.",
-        imageUrl: "",
+        title: "الرياضة ودعم الشباب",
+        description: "دعم الرياضة والمؤسسات الرياضية وتكريم الفائزين بالبطولات.",
+        imageUrl: "/images/activities/sports.jpg",
     },
     {
-        id: "3",
+        id: "charity",
         order: 3,
-        title: "تطوير مستشفي أطفال بنها بالأجهزة",
-        description: "توفير بعض الأجهزة في مستشفي أطفال بنها (وحدة أسنان - جهاز تخدير - كشاف عمليات - جهاز تنفس صناعي).",
-        imageUrl: "",
+        title: "العمل الخيري",
+        description: "مبادرات مجتمعية وخدمات تستهدف أبناء الدائرة والأسر الأكثر احتياجاً.",
+        imageUrl: "/images/activities/charity.jpg",
     },
 ];
 
-export default function AchievementsManagementPage() {
-    const [items, setItems] = useState<AchievementItem[]>(INITIAL_ITEMS);
+export default function ActivitiesManagementPage() {
+    const [items, setItems] = useState<ActivityItem[]>(INITIAL_ITEMS);
     const [saving, setSaving] = useState(false);
 
+    // حالة التحكم بـ ActivityModal
     const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
-    const [activeItem, setActiveItem] = useState<AchievementItem | undefined>(undefined);
+    const [activeItem, setActiveItem] = useState<ActivityItem | undefined>(undefined);
+
+    // حالة التحكم بـ ConfirmDialog الخاص بالحذف
     const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
 
     const openAddModal = () => {
@@ -45,7 +48,7 @@ export default function AchievementsManagementPage() {
         setModalMode("add");
     };
 
-    const openEditModal = (item: AchievementItem) => {
+    const openEditModal = (item: ActivityItem) => {
         setActiveItem(item);
         setModalMode("edit");
     };
@@ -69,7 +72,7 @@ export default function AchievementsManagementPage() {
         setDeletingItemId(null);
     };
 
-    const handleModalSave = (item: Omit<AchievementItem, "order">) => {
+    const handleModalSave = (item: Omit<ActivityItem, "order">) => {
         setItems((prev) => {
             const exists = prev.some((p) => p.id === item.id);
             if (exists) {
@@ -90,30 +93,30 @@ export default function AchievementsManagementPage() {
         <>
             <PageHeader
                 breadcrumb="إدارة الموقع"
-                title="ما تم إنجازه"
+                title="الأنشطة والفعاليات"
                 lastSavedLabel="آخر حفظ: منذ دقيقة"
             />
 
             <div className="flex-1 flex flex-col gap-6 px-6 md:px-10 pb-6">
                 <section className="card">
                     <div className="flex items-center justify-between mb-1">
-                        <h2 className="text-title-card text-on-surface">قائمة الإنجازات ({items.length})</h2>
+                        <h2 className="text-title-card text-on-surface">قائمة مجالات العمل والأنشطة ({items.length})</h2>
                         <button
                             type="button"
                             onClick={openAddModal}
                             className="btn-outline flex items-center gap-2 px-4 py-2 text-body-small font-semibold"
                         >
                             <Plus size={15} />
-                            <span>إضافة إنجاز جديد</span>
+                            <span>إضافة مجال جديد</span>
                         </button>
                     </div>
                     <p className="text-body-small text-on-surface-variant mb-5">
-                        قم بإدارة بطاقات قسم &quot;ما تم إنجازه&quot; التي تظهر في الواجهة الرئيسية للموقع.
+                        قم بإدارة بطاقات مجالات العمل والأنشطة التي تظهر في الواجهة الرئيسية للموقع.
                     </p>
 
                     <div className="flex flex-col gap-3">
                         {items.map((item) => (
-                            <AchievementItemRow
+                            <ActivityItemRow
                                 key={item.id}
                                 item={item}
                                 onEdit={openEditModal}
@@ -123,7 +126,7 @@ export default function AchievementsManagementPage() {
 
                         {items.length === 0 && (
                             <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
-                                لا توجد إنجازات مضافة بعد. ابدأ بإضافة أول إنجاز.
+                                لا توجد مجالات مضافة بعد. ابدأ بإضافة أول مجال عمل.
                             </div>
                         )}
                     </div>
@@ -137,7 +140,7 @@ export default function AchievementsManagementPage() {
                 saving={saving}
             />
 
-            <AchievementModal
+            <ActivityModal
                 open={modalMode !== null}
                 initialItem={activeItem}
                 onClose={closeModal}
@@ -146,10 +149,10 @@ export default function AchievementsManagementPage() {
 
             <ConfirmDialog
                 open={deletingItemId !== null}
-                title="حذف الإنجاز"
+                title="حذف مجال العمل"
                 description={
                     <span>
-                        هل أنت تأكد من حذف <strong>&quot;{targetDeleteItem?.title}&quot;</strong>؟ لا يمكنك التراجع عن هذه الخطوة.
+                        هل أنت تأكد من حذف مجال <strong>&quot;{targetDeleteItem?.title}&quot;</strong>؟ لا يمكنك التراجع عن هذه الخطوة.
                     </span>
                 }
                 confirmLabel="حذف"

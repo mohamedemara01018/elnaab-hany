@@ -1,4 +1,4 @@
-import HeroManagementDashboardPage from '@/views/HeroManagementDashboardPage'
+import HeroManagementDashboardPage from '@/views/landing-dashboard/HeroManagementDashboardPage'
 import React from 'react'
 
 function page() {

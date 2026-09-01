@@ -4,8 +4,8 @@
 
 import { useEffect, useState } from "react";
 import { X, Upload, Trash2, Image as ImageIcon } from "lucide-react";
-import { ActivityItem } from "@/components/dashboard/activities-management-dashboard-page/Activityitemrow";
-import { Field, InputWithIcon, TextareaField } from "@/components/dashboard/hero-management-dashboard-page/Formfield";
+import { ActivityItem } from "@/components/landing-dashboard/activities-management-dashboard-page/Activityitemrow";
+import { Field, InputWithIcon, TextareaField } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
 
 type ModalProps = {
     open: boolean;

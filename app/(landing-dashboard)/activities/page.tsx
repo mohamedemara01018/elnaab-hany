@@ -1,4 +1,4 @@
-import ActivitiesManagementPage from '@/views/ActivitiesManagementPage'
+import ActivitiesManagementPage from '@/views/landing-dashboard/ActivitiesManagementPage'
 import React from 'react'
 
 function page() {

@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { X, Upload, Link as LinkIcon } from "lucide-react";
-import { BriefingRequestItem } from "@/components/dashboard/briefing-requests-dashboard-page/BriefingRequestItemRow";
-import { Field, InputWithIcon, TextareaField } from "@/components/dashboard/hero-management-dashboard-page/Formfield";
+import { BriefingRequestItem } from "@/components/landing-dashboard/briefing-requests-dashboard-page/BriefingRequestItemRow";
+import { Field, InputWithIcon, TextareaField } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
 
 type ModalProps = {
     open: boolean;

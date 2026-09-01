@@ -1,4 +1,4 @@
-import BriefingRequestsPage from '@/views/BriefingRequestsPage'
+import BriefingRequestsPage from '@/views/landing-dashboard/BriefingRequestsPage'
 
 function page() {
     return (

@@ -1,6 +1,6 @@
 'use client'
 import { DashboardLayout } from '@/components/layout/dashboard/DashboardLayout'
-import { NAV_ITEMS_DASH } from '@/utils/constant.utils'
+import { NAV_ITEMS_MAHER_DASH } from '@/utils/constant.utils'
 import React from 'react'
 
 
@@ -8,7 +8,7 @@ function layout({
     children,
 }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <DashboardLayout userName="أدمن هاني شحاتة" userRole="المسؤول" NAV_ITEMS={NAV_ITEMS_DASH}>
+        <DashboardLayout userName="أدمن هاني شحاتة" userRole="المسؤول" NAV_ITEMS={NAV_ITEMS_MAHER_DASH}>
             {children}
         </DashboardLayout>
     )
