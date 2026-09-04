@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Suspense } from "react";
-import ResetPasswordForm from "@/components/reset-password/ResetPasswordForm";
+import VerifyCodeForm from "@/components/verify-code/VerifyCodeForm";
 
 export default function Page() {
     return (
@@ -12,7 +12,7 @@ export default function Page() {
             >
                 {/* زر العودة للخلف */}
                 <Link
-                    href="/verify-code"
+                    href="/forgot-password"
                     aria-label="العودة"
                     className="absolute top-6 inset-s-6 p-2 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors inline-flex items-center justify-center"
                 >
@@ -22,7 +22,7 @@ export default function Page() {
                 {/* العنوان والتنسيق */}
                 <div className="text-center mb-8">
                     <span className="text-label-overline block mt-5">البوابة الإدارية</span>
-                    <h1 className="font-display text-2xl font-bold mt-1.5 text-on-surface">إعادة تعيين كلمة المرور</h1>
+                    <h1 className="font-display text-2xl font-bold mt-1.5 text-on-surface">إدخال كود التحقق</h1>
                     <i
                         className="block mt-3"
                         style={{
@@ -35,7 +35,8 @@ export default function Page() {
                     />
                 </div>
 
-                <ResetPasswordForm />
+                {/* النموذج */}
+                <VerifyCodeForm />
 
                 <p className="text-body-small text-center text-on-surface-variant mt-7">
                     هذا النظام مخصص للمصرح لهم فقط. يتم تسجيل جميع الأنشطة.

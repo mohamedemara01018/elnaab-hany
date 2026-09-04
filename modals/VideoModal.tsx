@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Upload, Video as VideoIcon, Link as LinkIcon } from "lucide-react";
+import { X, Upload, CheckCircle2 } from "lucide-react";
 import { Field, InputWithIcon } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
 import { VideoItem } from "@/components/landing-dashboard/video-management-dashboard-page/VideoItemRow";
 
@@ -10,21 +10,26 @@ type ModalProps = {
     open: boolean;
     initialItem?: VideoItem;
     onClose: () => void;
-    onSave: (item: Omit<VideoItem, "order">) => void;
+    onSave: (
+        itemData: { title: string; media?: File | Blob },
+        id?: string
+    ) => void;
 };
 
 export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
     const [title, setTitle] = useState("");
-    const [videoUrl, setVideoUrl] = useState("");
+    const [previewUrl, setPreviewUrl] = useState("");
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     useEffect(() => {
         if (initialItem) {
             setTitle(initialItem.title);
-            setVideoUrl(initialItem.videoUrl || "");
+            setPreviewUrl(initialItem.videoUrl || "");
         } else {
             setTitle("");
-            setVideoUrl("");
+            setPreviewUrl("");
         }
+        setSelectedFile(null);
     }, [initialItem, open]);
 
     useEffect(() => {
@@ -41,34 +46,36 @@ export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            const previewUrl = URL.createObjectURL(file);
-            setVideoUrl(previewUrl);
+            setSelectedFile(file);
+            const objectUrl = URL.createObjectURL(file);
+            setPreviewUrl(objectUrl);
         }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({
-            id: initialItem?.id || Date.now().toString(),
-            title,
-            videoUrl,
-        });
-        onClose();
+        onSave(
+            {
+                title,
+                media: selectedFile || undefined,
+            },
+            initialItem?.id
+        );
     };
 
     return (
         <div dir="rtl" className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
             <button type="button" aria-label="إغلاق" onClick={onClose} className="absolute inset-0 bg-slate-dark/50 backdrop-blur-[2px]" />
 
-            <div className="relative w-full max-w-lg rounded-card bg-surface-container-lowest border border-outline-variant shadow-level-2 z-10">
-                <form onSubmit={handleSubmit}>
+            <div className="relative w-full max-w-lg rounded-card bg-surface-container-lowest border border-outline-variant shadow-level-2 z-10 max-h-[90vh] flex flex-col">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
                     <div className="flex items-start justify-between gap-4 px-6 pt-6 pb-4 border-b border-outline-variant">
                         <div>
                             <h2 className="text-title-card text-on-surface" style={{ fontSize: 20 }}>
                                 {initialItem ? "تعديل الفيديو" : "إضافة فيديو جديد"}
                             </h2>
                             <p className="text-body-small text-on-surface-variant mt-1">
-                                أدخل عنوان الفيديو وقام برفع ملف الفيديو أو إضافة الرابط.
+                                أدخل عنوان الفيديو وقام برفع ملف الفيديو الخاص بك.
                             </p>
                         </div>
                         <button type="button" onClick={onClose} aria-label="إغلاق" className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
@@ -76,7 +83,7 @@ export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
                         </button>
                     </div>
 
-                    <div className="px-6 py-5 flex flex-col gap-4">
+                    <div className="px-6 py-5 flex flex-col gap-4 overflow-y-auto">
                         <Field label="عنوان الكلمة / الفيديو">
                             <InputWithIcon
                                 value={title}
@@ -86,27 +93,26 @@ export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
                             />
                         </Field>
 
-                        <Field label="رابط الفيديو (URL)">
-                            <InputWithIcon
-                                value={videoUrl}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setVideoUrl(e.target.value)}
-                                placeholder="https://..."
-                                icon={<LinkIcon size={16} />}
-                            />
-                        </Field>
+                        {previewUrl && (
+                            <Field label="معاينة الفيديو الحالي">
+                                <div className="overflow-hidden rounded-interactive border border-outline-variant bg-black">
+                                    <video
+                                        src={previewUrl}
+                                        controls
+                                        className="w-full max-h-56 object-contain"
+                                    />
+                                </div>
+                            </Field>
+                        )}
 
-                        <div className="flex items-center gap-3 my-1">
-                            <div className="h-[1px] flex-1 bg-outline-variant" />
-                            <span className="text-caption text-on-surface-variant">أو قم برفع ملف مباشرة</span>
-                            <div className="h-[1px] flex-1 bg-outline-variant" />
-                        </div>
-
-                        <Field label="ملف الفيديو">
+                        <Field label={initialItem ? "تغيير ملف الفيديو" : "ملف الفيديو"}>
                             <label className="flex flex-col items-center justify-center gap-2 p-5 rounded-interactive border-2 border-dashed border-outline-variant hover:border-primary/50 bg-surface-container-low cursor-pointer transition-colors">
                                 <div className="p-3 rounded-full bg-surface-container-high text-on-surface-variant">
-                                    <Upload size={18} />
+                                    {selectedFile ? <CheckCircle2 size={18} className="text-primary" /> : <Upload size={18} />}
                                 </div>
-                                <span className="text-body-small font-semibold text-primary">اختيار فيديو من الجهاز</span>
+                                <span className="text-body-small font-semibold text-primary">
+                                    {selectedFile ? selectedFile.name : "اختيار فيديو من الجهاز"}
+                                </span>
                                 <input type="file" accept="video/*" className="hidden" onChange={handleFileChange} />
                             </label>
                         </Field>
@@ -125,4 +131,3 @@ export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
         </div>
     );
 }
-

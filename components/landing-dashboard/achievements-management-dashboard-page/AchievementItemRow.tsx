@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Edit2, Trash2, Image as ImageIcon } from "lucide-react";
+import { Edit2, Trash2, Image as ImageIcon, Maximize2 } from "lucide-react";
 
 export type AchievementItem = {
     id: string;
@@ -15,16 +15,36 @@ type AchievementItemRowProps = {
     item: AchievementItem;
     onEdit: (item: AchievementItem) => void;
     onRemove: (id: string) => void;
+    onPreviewImage?: (src: string, title: string) => void;
 };
 
-export function AchievementItemRow({ item, onEdit, onRemove }: AchievementItemRowProps) {
+export function AchievementItemRow({
+    item,
+    onEdit,
+    onRemove,
+    onPreviewImage,
+}: AchievementItemRowProps) {
     return (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-outline-variant bg-surface hover:border-primary/50 transition-colors">
             <div className="flex items-center gap-4 min-w-0">
                 {/* Image Thumbnail */}
                 <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-surface-container-high border border-outline-variant flex items-center justify-center shrink-0">
                     {item.imageUrl ? (
-                        <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                        <button
+                            type="button"
+                            onClick={() => onPreviewImage?.(item.imageUrl!, item.title)}
+                            className="relative w-full h-full group cursor-pointer"
+                            aria-label="تكبير الصورة"
+                        >
+                            <img
+                                src={item.imageUrl}
+                                alt={item.title}
+                                className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white">
+                                <Maximize2 size={18} />
+                            </div>
+                        </button>
                     ) : (
                         <div className="flex items-center justify-center text-on-surface-variant/40">
                             <ImageIcon size={24} />

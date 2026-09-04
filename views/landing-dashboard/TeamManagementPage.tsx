@@ -152,12 +152,7 @@ export default function TeamManagementPage() {
                 </section>
             </div>
 
-            <SaveBar
-                helperText="التغييرات تظهر في الموقع فور الحفظ."
-                onSave={handleSave}
-                onDiscard={() => setTeam(INITIAL_TEAM)}
-                saving={saving}
-            />
+           
 
             <TeamModal
                 open={modalMode !== null}

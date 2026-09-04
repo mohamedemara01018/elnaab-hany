@@ -11,13 +11,14 @@ type ModalProps = {
     open: boolean;
     initialItem?: ActivityItem;
     onClose: () => void;
-    onSave: (item: Omit<ActivityItem, "order">) => void;
+    onSave: (item: Omit<ActivityItem, "order">, imageFile?: File) => void;
 };
 
 export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [imageUrl, setImageUrl] = useState("");
+    const [imageFile, setImageFile] = useState<File | undefined>(undefined);
 
     // تحديث قيم المدخلات عند فتح الـ Modal أو تغيير العناصر
     useEffect(() => {
@@ -25,10 +26,12 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
             setTitle(initialItem.title);
             setDescription(initialItem.description);
             setImageUrl(initialItem.imageUrl || "");
+            setImageFile(undefined);
         } else {
             setTitle("");
             setDescription("");
             setImageUrl("");
+            setImageFile(undefined);
         }
     }, [initialItem, open]);
 
@@ -48,6 +51,7 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            setImageFile(file);
             const previewUrl = URL.createObjectURL(file);
             setImageUrl(previewUrl);
         }
@@ -55,17 +59,20 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
 
     const handleRemoveImage = () => {
         setImageUrl("");
+        setImageFile(undefined);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({
-            id: initialItem?.id || Date.now().toString(),
-            title,
-            description,
-            imageUrl,
-        });
-        onClose();
+        onSave(
+            {
+                id: initialItem?.id || "",
+                title,
+                description,
+                imageUrl,
+            },
+            imageFile
+        );
     };
 
     return (

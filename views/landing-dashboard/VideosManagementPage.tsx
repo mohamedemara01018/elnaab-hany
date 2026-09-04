@@ -1,122 +1,176 @@
-
 "use client";
 
-import { useState } from "react";
-import { Plus } from "lucide-react";
-
-import ConfirmDialog from "@/components/ui/Confirmdialog";
-import { VideoItem, VideoItemRow } from "@/components/landing-dashboard/video-management-dashboard-page/VideoItemRow";
-import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
+import { useState, useEffect, useCallback } from "react";
+import { Plus, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
-import { VideoModal } from "@/modals/VideoModal";
-
-const INITIAL_VIDEOS: VideoItem[] = [
-    {
-        id: "v1",
-        order: 1,
-        title: "حلف اليمين داخل البرلمان",
-        videoUrl: "/videos/oath.mp4",
-    },
-    {
-        id: "v2",
-        order: 2,
-        title: "كلمة داخل البرلمان عن مقترح المادة الرابعة",
-        videoUrl: "/videos/speech-article-4.mp4",
-    },
-    {
-        id: "v3",
-        order: 3,
-        title: "عرض مشكلة طريق بنها المنصورة",
-        videoUrl: "/videos/banha-road.mp4",
-    },
-    {
-        id: "v4",
-        order: 4,
-        title: "مناقشة مشكلة مركز شباب كفر شكر",
-        videoUrl: "/videos/kafr-shokr.mp4",
-    },
-    {
-        id: "v5",
-        order: 5,
-        title: "أزمة الضغط علي مستشفي بنها الجامعي",
-        videoUrl: "/videos/banha-hospital.mp4",
-    },
-    {
-        id: "v6",
-        order: 6,
-        title: "مناقشة قانون التصالح في مخالفات البناء",
-        videoUrl: "/videos/reconciliation-law.mp4",
-    },
-];
+import ConfirmDialog from "@/components/ui/Confirmdialog";
+import { VideoModal as VideoFormModal } from "@/modals/VideoModal";
+import VideoPreviewModal from "@/components/ui/VideoModal";
+import { VideoItem, VideoItemRow } from "@/components/landing-dashboard/video-management-dashboard-page/VideoItemRow";
+import { videoService } from "@/services/video.service";
+import { useDispatch } from "react-redux";
+import { toastify } from "@/store/slices/toastificationSlice";
 
 export default function VideosManagementPage() {
-    const [videos, setVideos] = useState<VideoItem[]>(INITIAL_VIDEOS);
-    const [saving, setSaving] = useState(false);
+    const dispatch = useDispatch();
+
+    const [items, setItems] = useState<VideoItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [deleting, setDeleting] = useState(false);
 
     const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
-    const [activeVideo, setActiveVideo] = useState<VideoItem | undefined>(undefined);
-    const [deletingVideoId, setDeletingVideoId] = useState<string | null>(null);
+    const [activeItem, setActiveItem] = useState<VideoItem | undefined>(undefined);
+    const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
+
+    // حالة التحكم بـ VideoPreviewModal لمشاهدة الفيديو
+    const [previewVideo, setPreviewVideo] = useState<{ src: string; title: string } | null>(null);
+
+    // Fetch videos from API
+    const fetchVideos = useCallback(async () => {
+        setLoading(true);
+        try {
+            const response = await videoService.getAll();
+            if (response.isSuccess && Array.isArray(response.value)) {
+                const mappedItems: VideoItem[] = response.value.map((item, index) => ({
+                    id: String(item.id),
+                    order: index + 1,
+                    title: item.title,
+                    videoUrl: item.mediaUrl || "",
+                }));
+                setItems(mappedItems);
+            }
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "حدث خطأ أثناء جلب الفيديوهات.";
+            dispatch(toastify({ message, type: "error" }));
+        } finally {
+            setLoading(false);
+        }
+    }, [dispatch]);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchVideos();
+    }, [fetchVideos]);
 
     const openAddModal = () => {
-        setActiveVideo(undefined);
+        setActiveItem(undefined);
         setModalMode("add");
     };
 
     const openEditModal = (item: VideoItem) => {
-        setActiveVideo(item);
+        setActiveItem(item);
         setModalMode("edit");
     };
 
     const closeModal = () => {
         setModalMode(null);
-        setActiveVideo(undefined);
+        setActiveItem(undefined);
     };
 
-    const handleRequestRemove = (id: string) => {
-        setDeletingVideoId(id);
+    const handleRemove = (id: string) => {
+        setDeletingItemId(Number(id));
     };
 
-    const handleConfirmRemove = () => {
-        if (!deletingVideoId) return;
-        setVideos((prev) =>
-            prev
-                .filter((item) => item.id !== deletingVideoId)
-                .map((item, index) => ({ ...item, order: index + 1 }))
-        );
-        setDeletingVideoId(null);
+    const handlePreviewVideo = (src: string, title: string) => {
+        setPreviewVideo({ src, title });
     };
 
-    const handleModalSave = (item: Omit<VideoItem, "order">) => {
-        setVideos((prev) => {
-            const exists = prev.some((p) => p.id === item.id);
-            if (exists) {
-                return prev.map((p) => (p.id === item.id ? { ...p, ...item } : p));
+    // Delete video via API
+    const handleConfirmRemove = async () => {
+        if (!deletingItemId) return;
+        setDeleting(true);
+        try {
+            const response = await videoService.delete(deletingItemId);
+            if (response.isSuccess) {
+                dispatch(toastify({ message: response.message || "تم حذف الفيديو بنجاح.", type: "success" }));
+                await fetchVideos();
+            } else {
+                dispatch(toastify({ message: response.message || "تعذر حذف الفيديو.", type: "error" }));
             }
-            return [...prev, { ...item, order: prev.length + 1 }];
-        });
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "حدث خطأ أثناء حذف الفيديو.";
+            dispatch(toastify({ message, type: "error" }));
+        } finally {
+            setDeleting(false);
+            setDeletingItemId(null);
+        }
     };
 
-    const handleSave = () => {
-        setSaving(true);
-        setTimeout(() => setSaving(false), 900);
+    // Save/Update video via Modal and API
+    const handleModalSave = async (
+        itemData: { title: string; media?: File | Blob },
+        id?: string
+    ) => {
+        try {
+            if (id) {
+                // Edit Mode
+                let mediaFile: File | undefined = undefined;
+
+                if (itemData.media) {
+                    if (itemData.media instanceof File) {
+                        mediaFile = itemData.media;
+                    } else {
+                        // Convert Blob to File if needed by the payload type
+                        mediaFile = new File([itemData.media], "video.mp4", { type: itemData.media.type });
+                    }
+                }
+
+                const response = await videoService.update(Number(id), {
+                    Title: itemData.title,
+                    ...(mediaFile ? { Media: mediaFile } : {}),
+                });
+
+                if (response.isSuccess) {
+                    dispatch(toastify({ message: response.message || "تم تحديث الفيديو بنجاح.", type: "success" }));
+                    closeModal();
+                    await fetchVideos();
+                } else {
+                    dispatch(toastify({ message: response.message || "تعذر تحديث الفيديو.", type: "error" }));
+                }
+            } else {
+                // Add Mode
+                if (!itemData.media) {
+                    dispatch(toastify({ message: "يرجى تحديد ملف الفيديو.", type: "error" }));
+                    return;
+                }
+
+                const mediaFile = itemData.media instanceof File
+                    ? itemData.media
+                    : new File([itemData.media], "video.mp4", { type: itemData.media.type });
+
+                const response = await videoService.create({
+                    Title: itemData.title,
+                    Media: mediaFile,
+                });
+
+                if (response.isSuccess) {
+                    dispatch(toastify({ message: response.message || "تمت إضافة الفيديو بنجاح.", type: "success" }));
+                    closeModal();
+                    await fetchVideos();
+                } else {
+                    dispatch(toastify({ message: response.message || "تعذر إضافة الفيديو.", type: "error" }));
+                }
+            }
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "حدث خطأ أثناء الحفظ.";
+            dispatch(toastify({ message, type: "error" }));
+        }
     };
 
-    const targetDeleteVideo = videos.find((item) => item.id === deletingVideoId);
+    const targetDeleteItem = items.find((item) => item.id === String(deletingItemId));
 
     return (
         <>
             <PageHeader
                 breadcrumb="إدارة الموقع"
                 title="اللقاءات التلفزيونية والبرلمانية"
-                lastSavedLabel="آخر حفظ: منذ ۱۰ دقائق"
+                lastSavedLabel="يتم التحديث مباشرة عند إجراء التغييرات"
             />
 
             <div className="flex-1 flex flex-col gap-6 px-6 md:px-10 pb-6">
-
-
                 <section className="card">
                     <div className="flex items-center justify-between mb-1">
-                        <h2 className="text-title-card text-on-surface">قائمة الفيديوهات والكلمات ({videos.length})</h2>
+                        <h2 className="text-title-card text-on-surface">قائمة الفيديوهات والكلمات ({items.length})</h2>
                         <button
                             type="button"
                             onClick={openAddModal}
@@ -130,52 +184,60 @@ export default function VideosManagementPage() {
                         يتم عرض الفيديوهات داخل الصفحة الرئيسية في شبكة من البطاقات وفق الترتيب الموضح أدناه.
                     </p>
 
-                    <div className="flex flex-col gap-3">
-                        {videos.map((item) => (
-                            <VideoItemRow
-                                key={item.id}
-                                item={item}
-                                onEdit={openEditModal}
-                                onRemove={handleRequestRemove}
-                            />
-                        ))}
+                    {loading ? (
+                        <div className="flex items-center justify-center py-16 text-primary">
+                            <Loader2 className="w-8 h-8 animate-spin" />
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            {items.map((item) => (
+                                <VideoItemRow
+                                    key={item.id}
+                                    item={item}
+                                    onEdit={openEditModal}
+                                    onRemove={handleRemove}
+                                    onPreviewVideo={handlePreviewVideo}
+                                />
+                            ))}
 
-                        {videos.length === 0 && (
-                            <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
-                                لا توجد فيديوهات مضافة بعد. ابدأ بإضافة أول فيديو.
-                            </div>
-                        )}
-                    </div>
+                            {items.length === 0 && (
+                                <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
+                                    لا توجد فيديوهات مضافة بعد. ابدأ بإضافة أول فيديو.
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </section>
             </div>
 
-            <SaveBar
-                helperText="التغييرات تظهر في الموقع فور الحفظ."
-                onSave={handleSave}
-                onDiscard={() => setVideos(INITIAL_VIDEOS)}
-                saving={saving}
-            />
-
-            <VideoModal
+            <VideoFormModal
                 open={modalMode !== null}
-                initialItem={activeVideo}
+                initialItem={activeItem}
                 onClose={closeModal}
                 onSave={handleModalSave}
             />
 
             <ConfirmDialog
-                open={deletingVideoId !== null}
+                open={deletingItemId !== null}
                 title="حذف الفيديو"
                 description={
                     <span>
-                        هل أنت تأكد من حذف كلمة <strong>&quot;{targetDeleteVideo?.title}&quot;</strong>؟ لا يمكنك التراجع عن هذه الخطوة.
+                        هل أنت تأكد من حذف كلمة <strong>&quot;{targetDeleteItem?.title}&quot;</strong>؟ لا يمكنك التراجع عن هذه الخطوة.
                     </span>
                 }
-                confirmLabel="حذف"
+                confirmLabel={deleting ? "جارٍ الحذف..." : "حذف"}
                 cancelLabel="إلغاء"
                 variant="danger"
                 onConfirm={handleConfirmRemove}
-                onClose={() => setDeletingVideoId(null)}
+                onClose={() => setDeletingItemId(null)}
+            />
+
+            {/* Video Player Preview Modal */}
+            <VideoPreviewModal
+                isOpen={previewVideo !== null}
+                src={previewVideo?.src || ""}
+                title={previewVideo?.title || "معاينة الفيديو"}
+                onClose={() => setPreviewVideo(null)}
             />
         </>
     );

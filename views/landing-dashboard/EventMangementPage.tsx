@@ -1,53 +1,62 @@
 "use client";
 
-import { useState } from "react";
-import { Plus } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Plus, Loader2 } from "lucide-react";
 import ConfirmDialog from "@/components/ui/Confirmdialog";
 import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
-import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
 import { EventModal } from "@/modals/EventModal";
 import { EventItem, EventItemRow } from "@/components/landing-dashboard/event-management-dashboard-page/EventsItemRow";
-
-const INITIAL_EVENTS: EventItem[] = [
-    {
-        id: "1",
-        order: 1,
-        title: "فعالية مجتمعية",
-        description: "تكريم النائب لحفاظ القرآن الكريم.",
-        location: "القليوبية",
-        date: "05 يوليو",
-        type: "video",
-        mediaUrl: "",
-    },
-    {
-        id: "2",
-        order: 2,
-        title: "لقاء مع أهالي الدائرة",
-        description: "لقاء مفتوح للاستماع إلى طلبات المواطنين ومناقشة أهم الملفات.",
-        location: "كفر شكر",
-        date: "22 يونيو",
-        type: "image",
-        mediaUrl: "",
-    },
-    {
-        id: "3",
-        order: 3,
-        title: "جولة ميدانية لمتابعة الخدمات",
-        description: "متابعة الخدمات والملفات الخاصة بالمواطنين.",
-        location: "بنها",
-        date: "10 يونيو",
-        type: "image",
-        mediaUrl: "",
-    },
-];
+import { ActivityVisit } from "@/types/activity-visit.types";
+import { activityVisitService } from "@/services/activities-visits.service";
+import ImageModal from "@/components/ui/ImageModal";
 
 export default function EventsManagementPage() {
-    const [items, setItems] = useState<EventItem[]>(INITIAL_EVENTS);
-    const [saving, setSaving] = useState(false);
+    const [items, setItems] = useState<EventItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
     const [activeItem, setActiveItem] = useState<EventItem | undefined>(undefined);
     const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    // حالة التحكم بـ ImageModal لمعاينة الصور
+    const [previewImage, setPreviewImage] = useState<{ src: string; title: string } | null>(null);
+
+    // تحويل بيانات الـ API إلى الهيكل المستعمل في الواجهة
+    const mapToEventItem = (item: ActivityVisit, index: number): EventItem => ({
+        id: item.id.toString(),
+        order: index + 1,
+        title: item.title,
+        description: item.description,
+        location: item.location,
+        date: item.date ? item.date.split("T")[0] : "",
+        type: item.contentType?.includes("video") ? "video" : "image",
+        mediaUrl: item.mediaUrl,
+    });
+
+    // جلب البيانات من الـ API
+    const fetchActivities = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await activityVisitService.getAll();
+            if (res.isSuccess && Array.isArray(res.value)) {
+                const mapped = res.value.map((item, index) => mapToEventItem(item, index));
+                setItems(mapped);
+            }
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "حدث خطأ أثناء جلب البيانات";
+            setError(message);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchActivities();
+    }, [fetchActivities]);
 
     const openAddModal = () => {
         setActiveItem(undefined);
@@ -68,29 +77,52 @@ export default function EventsManagementPage() {
         setDeletingItemId(id);
     };
 
-    const handleConfirmRemove = () => {
+    const handlePreviewImage = (src: string, title: string) => {
+        setPreviewImage({ src, title });
+    };
+
+    // تأكيد الحذف واستدعاء API الحذف
+    const handleConfirmRemove = async () => {
         if (!deletingItemId) return;
-        setItems((prev) =>
-            prev
-                .filter((item) => item.id !== deletingItemId)
-                .map((item, index) => ({ ...item, order: index + 1 }))
-        );
-        setDeletingItemId(null);
+        setDeleting(true);
+        try {
+            await activityVisitService.delete(Number(deletingItemId));
+            await fetchActivities();
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "فشل حذف الفعالية";
+            alert(message);
+        } finally {
+            setDeleting(false);
+            setDeletingItemId(null);
+        }
     };
 
-    const handleModalSave = (item: Omit<EventItem, "order">) => {
-        setItems((prev) => {
-            const exists = prev.some((p) => p.id === item.id);
-            if (exists) {
-                return prev.map((p) => (p.id === item.id ? { ...p, ...item } : p));
-            }
-            return [...prev, { ...item, order: prev.length + 1 }];
-        });
-    };
-
-    const handleSave = () => {
-        setSaving(true);
-        setTimeout(() => setSaving(false), 900);
+    // حفظ البيانات (إضافة أو تعديل) عند إرسال النموذج من الـ Modal
+    const handleModalSave = async (data: {
+        title: string;
+        description: string;
+        location: string;
+        date?: string;
+        media?: File;
+    }) => {
+        if (modalMode === "edit" && activeItem) {
+            await activityVisitService.update(Number(activeItem.id), {
+                Title: data.title,
+                Description: data.description,
+                Location: data.location,
+                Date: data.date,
+                Media: data.media,
+            });
+        } else {
+            await activityVisitService.create({
+                Title: data.title,
+                Description: data.description,
+                Location: data.location,
+                Date: data.date,
+                Media: data.media,
+            });
+        }
+        await fetchActivities();
     };
 
     const targetDeleteItem = items.find((item) => item.id === deletingItemId);
@@ -100,13 +132,15 @@ export default function EventsManagementPage() {
             <PageHeader
                 breadcrumb="إدارة الموقع"
                 title="أحدث الزيارات والفعاليات"
-                lastSavedLabel="آخر حفظ: منذ دقيقة"
+                lastSavedLabel="تم التحديث التلقائي"
             />
 
             <div className="flex-1 flex flex-col gap-6 px-6 md:px-10 pb-6">
                 <section className="card">
                     <div className="flex items-center justify-between mb-1">
-                        <h2 className="text-title-card text-on-surface">قائمة الزيارات والفعاليات ({items.length})</h2>
+                        <h2 className="text-title-card text-on-surface">
+                            قائمة الزيارات والفعاليات ({items.length})
+                        </h2>
                         <button
                             type="button"
                             onClick={openAddModal}
@@ -120,31 +154,36 @@ export default function EventsManagementPage() {
                         قم بإدارة بطاقات الفعاليات والزيارات الميدانية التي تظهر في الواجهة الرئيسية للموقع.
                     </p>
 
-                    <div className="flex flex-col gap-3">
-                        {items.map((item) => (
-                            <EventItemRow
-                                key={item.id}
-                                item={item}
-                                onEdit={openEditModal}
-                                onRemove={handleRemove}
-                            />
-                        ))}
+                    {loading ? (
+                        <div className="flex items-center justify-center py-16 text-on-surface-variant gap-2">
+                            <Loader2 size={24} className="animate-spin text-primary" />
+                            <span>جاري تحميل الفعاليات...</span>
+                        </div>
+                    ) : error ? (
+                        <div className="rounded-card border border-error/20 bg-error-container/10 p-6 text-center text-error text-body-small">
+                            {error}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            {items.map((item) => (
+                                <EventItemRow
+                                    key={item.id}
+                                    item={item}
+                                    onEdit={openEditModal}
+                                    onRemove={handleRemove}
+                                    onPreviewImage={handlePreviewImage}
+                                />
+                            ))}
 
-                        {items.length === 0 && (
-                            <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
-                                لا توجد فعاليات مضافة بعد. ابدأ بإضافة أول فعالية.
-                            </div>
-                        )}
-                    </div>
+                            {items.length === 0 && (
+                                <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
+                                    لا توجد فعاليات مضافة بعد. ابدأ بإضافة أول فعالية.
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </section>
             </div>
-
-            <SaveBar
-                helperText="التغييرات تظهر في الموقع فور الحفظ."
-                onSave={handleSave}
-                onDiscard={() => setItems(INITIAL_EVENTS)}
-                saving={saving}
-            />
 
             <EventModal
                 open={modalMode !== null}
@@ -161,11 +200,19 @@ export default function EventsManagementPage() {
                         هل أنت تأكد من حذف <strong>&quot;{targetDeleteItem?.title}&quot;</strong>؟ لا يمكنك التراجع عن هذه الخطوة.
                     </span>
                 }
-                confirmLabel="حذف"
+                confirmLabel={deleting ? "جاري الحذف..." : "حذف"}
                 cancelLabel="إلغاء"
                 variant="danger"
                 onConfirm={handleConfirmRemove}
                 onClose={() => setDeletingItemId(null)}
+            />
+
+            {/* Image Preview Modal */}
+            <ImageModal
+                isOpen={previewImage !== null}
+                src={previewImage?.src || ""}
+                alt={previewImage?.title || "معاينة الصورة"}
+                onClose={() => setPreviewImage(null)}
             />
         </>
     );

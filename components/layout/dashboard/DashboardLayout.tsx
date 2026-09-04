@@ -43,7 +43,7 @@ export function DashboardLayout({ children, userName, userRole, NAV_ITEMS }: Das
                 style={{
                     paddingTop: `${HEADER_HEIGHT}px`,
                 }}
-                className="min-h-dvh flex flex-col transition-all duration-200 mr-0 lg:mr-[256px] w-full lg:w-[calc(100%-256px)]"
+                className="min-h-dvh flex flex-col transition-all duration-200 mr-0 lg:mr-64 w-full lg:w-[calc(100%-256px)]"
             >
                 <div className="p-4 sm:p-6 flex-1 flex flex-col w-full max-w-full overflow-x-hidden">
                     {children}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit2, Trash2, Video } from "lucide-react";
+import { Edit2, Trash2, Video, Play } from "lucide-react";
 
 export type VideoItem = {
     id: string;
@@ -13,16 +13,27 @@ type VideoItemRowProps = {
     item: VideoItem;
     onEdit: (item: VideoItem) => void;
     onRemove: (id: string) => void;
+    onPreviewVideo?: (src: string, title: string) => void;
 };
 
-export function VideoItemRow({ item, onEdit, onRemove }: VideoItemRowProps) {
+export function VideoItemRow({ item, onEdit, onRemove, onPreviewVideo }: VideoItemRowProps) {
     return (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-outline-variant bg-surface hover:border-primary/50 transition-colors">
             <div className="flex items-center gap-4 min-w-0">
                 {/* Media Preview Thumbnail */}
                 <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-surface-container-high border border-outline-variant flex items-center justify-center shrink-0">
                     {item.videoUrl ? (
-                        <video src={item.videoUrl} className="w-full h-full object-cover" />
+                        <button
+                            type="button"
+                            onClick={() => onPreviewVideo?.(item.videoUrl, item.title)}
+                            className="relative w-full h-full group cursor-pointer"
+                            aria-label="تشغيل الفيديو"
+                        >
+                            <video src={item.videoUrl} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white">
+                                <Play size={20} className="fill-white" />
+                            </div>
+                        </button>
                     ) : (
                         <div className="flex items-center justify-center text-on-surface-variant/40">
                             <Video size={24} />

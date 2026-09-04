@@ -27,3 +27,5 @@ export const NAV_ITEMS_EMPLOYEE_DASH = [
     { href: "/", label: "كل الشكاوى", icon: ClipboardList },
     { href: "/settings", label: "إعدادات الشكاوى", icon: Settings },
 ];
+
+export const DURATION = 1500

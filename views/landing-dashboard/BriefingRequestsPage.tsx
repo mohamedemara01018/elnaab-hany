@@ -1,45 +1,57 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, FileText } from "lucide-react";
-import { BriefingRequestModal } from "@/modals/BriefingRequestModal";
-import ConfirmDialog from "@/components/ui/Confirmdialog";
-import { BriefingRequestItem, BriefingRequestItemRow } from "@/components/landing-dashboard/briefing-requests-dashboard-page/BriefingRequestItemRow";
-import { Field, InputWithIcon, SectionCard, TextareaField } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
+import { useState, useEffect, useCallback } from "react";
+import { Plus, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
-import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
-
-const INITIAL_ITEMS: BriefingRequestItem[] = [
-    {
-        id: "1",
-        order: 1,
-        title: "خطة توصيل الغاز الطبيعي للمنازل",
-        description: "طلب توصيل الغاز الطبيعي للمنازل للتسهيل على أهالي الدائرة",
-        imageUrl: "/images/requests/gas.jpg",
-    },
-    {
-        id: "2",
-        order: 2,
-        title: "طلب تطوير كافة الطرق (بنها - ميت غمر)",
-        description: "الحرص على سلامة المواطنين ومعاينة كوبري المنشأة الكبرى وصيانته.",
-        imageUrl: "/images/requests/roads.jpg",
-    },
-    {
-        id: "3",
-        order: 3,
-        title: "طلبات تجهيز المستشفيات",
-        description: "توفير العلاج البيولوجي إلي مستشفى كفر شكر التخصصي تضامنا مع المرضي تسهيلا عليهم الانتقالات",
-        imageUrl: "/images/requests/health.jpg",
-    },
-];
+import ConfirmDialog from "@/components/ui/Confirmdialog";
+import { BriefingRequestModal } from "@/modals/BriefingRequestModal";
+import { BriefingRequestItem, BriefingRequestItemRow } from "@/components/landing-dashboard/briefing-requests-dashboard-page/BriefingRequestItemRow";
+import { briefingRequestsService } from "@/services/briefing-requests.service";
+import { useDispatch } from "react-redux";
+import { toastify } from "@/store/slices/toastificationSlice";
+import ImageModal from "@/components/ui/ImageModal";
 
 export default function BriefingRequestsPage() {
-    const [items, setItems] = useState<BriefingRequestItem[]>(INITIAL_ITEMS);
-    const [saving, setSaving] = useState(false);
+    const dispatch = useDispatch();
+
+    const [items, setItems] = useState<BriefingRequestItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [deleting, setDeleting] = useState(false);
 
     const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
     const [activeItem, setActiveItem] = useState<BriefingRequestItem | undefined>(undefined);
-    const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+    const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
+
+    // State for image preview modal
+    const [previewImage, setPreviewImage] = useState<{ src: string; title: string } | null>(null);
+
+    // Fetch briefing requests from API
+    const fetchBriefingRequests = useCallback(async () => {
+        setLoading(true);
+        try {
+            const response = await briefingRequestsService.getAll();
+            if (response.isSuccess && Array.isArray(response.value)) {
+                const mappedItems: BriefingRequestItem[] = response.value.map((item, index) => ({
+                    id: String(item.id),
+                    order: index + 1,
+                    title: item.title,
+                    description: item.description,
+                    imageUrl: item.mediaUrl || "",
+                }));
+                setItems(mappedItems);
+            }
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "حدث خطأ أثناء جلب طلبات الإحاطة.";
+            dispatch(toastify({ message, type: "error" }));
+        } finally {
+            setLoading(false);
+        }
+    }, [dispatch]);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchBriefingRequests();
+    }, [fetchBriefingRequests]);
 
     const openAddModal = () => {
         setActiveItem(undefined);
@@ -56,47 +68,81 @@ export default function BriefingRequestsPage() {
         setActiveItem(undefined);
     };
 
-    const handleRequestRemove = (id: string) => {
-        setDeletingItemId(id);
+    const handleRemove = (id: string) => {
+        setDeletingItemId(Number(id));
     };
 
-    const handleConfirmRemove = () => {
+    const handlePreviewImage = (src: string, title: string) => {
+        setPreviewImage({ src, title });
+    };
+
+    // Delete briefing request via API
+    const handleConfirmRemove = async () => {
         if (!deletingItemId) return;
-        setItems((prev) =>
-            prev
-                .filter((item) => item.id !== deletingItemId)
-                .map((item, index) => ({ ...item, order: index + 1 }))
-        );
-        setDeletingItemId(null);
-    };
-
-    const handleModalSave = (item: Omit<BriefingRequestItem, "order">) => {
-        setItems((prev) => {
-            const exists = prev.some((p) => p.id === item.id);
-            if (exists) {
-                return prev.map((p) => (p.id === item.id ? { ...p, ...item } : p));
+        setDeleting(true);
+        try {
+            const response = await briefingRequestsService.delete(deletingItemId);
+            if (response.isSuccess) {
+                dispatch(toastify({ message: response.message || "تم حذف طلب الإحاطة بنجاح.", type: "success" }));
+                await fetchBriefingRequests();
+            } else {
+                dispatch(toastify({ message: response.message || "تعذر حذف طلب الإحاطة.", type: "error" }));
             }
-            return [...prev, { ...item, order: prev.length + 1 }];
-        });
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "حدث خطأ أثناء حذف طلب الإحاطة.";
+            dispatch(toastify({ message, type: "error" }));
+        } finally {
+            setDeleting(false);
+            setDeletingItemId(null);
+        }
     };
 
-    const handleSave = () => {
-        setSaving(true);
-        setTimeout(() => setSaving(false), 900);
+    // Save/Update briefing request via Modal and API
+    const handleModalSave = async (
+        itemData: { title: string; description: string; media?: File | Blob },
+        id?: string
+    ) => {
+        try {
+            if (id) {
+                // Edit
+                const response = await briefingRequestsService.update(Number(id), {
+                    Title: itemData.title,
+                    Description: itemData.description,
+                    Media: itemData.media,
+                });
+                if (response.isSuccess) {
+                    dispatch(toastify({ message: response.message || "تم تحديث طلب الإحاطة بنجاح.", type: "success" }));
+                    fetchBriefingRequests();
+                }
+            } else {
+                // Create
+                const response = await briefingRequestsService.create({
+                    Title: itemData.title,
+                    Description: itemData.description,
+                    Media: itemData.media!,
+                });
+                if (response.isSuccess) {
+                    dispatch(toastify({ message: response.message || "تمت إضافة طلب الإحاطة بنجاح.", type: "success" }));
+                    fetchBriefingRequests();
+                }
+            }
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "حدث خطأ أثناء الحفظ.";
+            dispatch(toastify({ message, type: "error" }));
+        }
     };
 
-    const targetDeleteItem = items.find((item) => item.id === deletingItemId);
+    const targetDeleteItem = items.find((item) => item.id === String(deletingItemId));
 
     return (
         <>
             <PageHeader
                 breadcrumb="إدارة الموقع"
                 title="طلبات الإحاطة"
-                lastSavedLabel="آخر حفظ: منذ دقيقة"
+                lastSavedLabel="يتم التحديث مباشرة عند إجراء التغييرات"
             />
 
             <div className="flex-1 flex flex-col gap-6 px-6 md:px-10 pb-6">
-
                 <section className="card">
                     <div className="flex items-center justify-between mb-1">
                         <h2 className="text-title-card text-on-surface">طلبات الإحاطة ({items.length})</h2>
@@ -113,31 +159,31 @@ export default function BriefingRequestsPage() {
                         يتم عرض الترقيم التلقائي (01، 02، إلخ) على بطاقات طلبات الإحاطة في الموقع حسب الترتيب أدناه.
                     </p>
 
-                    <div className="flex flex-col gap-3">
-                        {items.map((item) => (
-                            <BriefingRequestItemRow
-                                key={item.id}
-                                item={item}
-                                onEdit={openEditModal}
-                                onRemove={handleRequestRemove}
-                            />
-                        ))}
+                    {loading ? (
+                        <div className="flex items-center justify-center py-16 text-primary">
+                            <Loader2 className="w-8 h-8 animate-spin" />
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            {items.map((item) => (
+                                <BriefingRequestItemRow
+                                    key={item.id}
+                                    item={item}
+                                    onEdit={openEditModal}
+                                    onRemove={handleRemove}
+                                    onPreviewImage={handlePreviewImage}
+                                />
+                            ))}
 
-                        {items.length === 0 && (
-                            <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
-                                لا توجد طلبات إحاطة مضافة بعد. ابدأ بإضافة أول طلب.
-                            </div>
-                        )}
-                    </div>
+                            {items.length === 0 && (
+                                <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
+                                    لا توجد طلبات إحاطة مضافة بعد. ابدأ بإضافة أول طلب.
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </section>
             </div>
-
-            <SaveBar
-                helperText="التغييرات تظهر في الموقع فور الحفظ."
-                onSave={handleSave}
-                onDiscard={() => setItems(INITIAL_ITEMS)}
-                saving={saving}
-            />
 
             <BriefingRequestModal
                 open={modalMode !== null}
@@ -154,11 +200,19 @@ export default function BriefingRequestsPage() {
                         هل أنت تأكد من حذف <strong>&quot;{targetDeleteItem?.title}&quot;</strong>؟ لا يمكنك التراجع عن هذه الخطوة.
                     </span>
                 }
-                confirmLabel="حذف"
+                confirmLabel={deleting ? "جارٍ الحذف..." : "حذف"}
                 cancelLabel="إلغاء"
                 variant="danger"
                 onConfirm={handleConfirmRemove}
                 onClose={() => setDeletingItemId(null)}
+            />
+
+            {/* Image Preview Modal */}
+            <ImageModal
+                isOpen={previewImage !== null}
+                src={previewImage?.src || ""}
+                alt={previewImage?.title || "معاينة الصورة"}
+                onClose={() => setPreviewImage(null)}
             />
         </>
     );

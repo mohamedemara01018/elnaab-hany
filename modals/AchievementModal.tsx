@@ -1,32 +1,44 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, Upload, Image as ImageIcon, Trash2 } from "lucide-react";
+import { X, Upload, Image as ImageIcon, Trash2, Loader2 } from "lucide-react";
 import { AchievementItem } from "@/components/landing-dashboard/achievements-management-dashboard-page/AchievementItemRow";
 
 interface AchievementModalProps {
     open: boolean;
     initialItem?: AchievementItem;
     onClose: () => void;
-    onSave: (item: Omit<AchievementItem, "order">) => void;
+    onSave: (
+        itemData: { title: string; description: string; media?: File },
+        id?: string
+    ) => Promise<void>;
 }
 
 export function AchievementModal({ open, initialItem, onClose, onSave }: AchievementModalProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [imageUrl, setImageUrl] = useState("");
+    const [previewUrl, setPreviewUrl] = useState("");
+    const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
+    const [submitting, setSubmitting] = useState(false);
+
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (initialItem) {
-            setTitle(initialItem.title);
-            setDescription(initialItem.description);
-            setImageUrl(initialItem.imageUrl || "");
-        } else {
-            setTitle("");
-            setDescription("");
-            setImageUrl("");
+        if (open) {
+            if (initialItem) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
+                setTitle(initialItem.title);
+                setDescription(initialItem.description);
+                setPreviewUrl(initialItem.imageUrl || "");
+            } else {
+                setTitle("");
+                setDescription("");
+                setPreviewUrl("");
+            }
+            setSelectedFile(undefined);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
         }
     }, [initialItem, open]);
 
@@ -35,27 +47,36 @@ export function AchievementModal({ open, initialItem, onClose, onSave }: Achieve
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            setSelectedFile(file);
             const tempUrl = URL.createObjectURL(file);
-            setImageUrl(tempUrl);
+            setPreviewUrl(tempUrl);
         }
     };
 
     const handleRemoveImage = () => {
-        setImageUrl("");
+        setPreviewUrl("");
+        setSelectedFile(undefined);
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({
-            id: initialItem?.id || Date.now().toString(),
-            title,
-            description,
-            imageUrl,
-        });
-        onClose();
+        setSubmitting(true);
+        try {
+            await onSave(
+                {
+                    title,
+                    description,
+                    media: selectedFile,
+                },
+                initialItem?.id
+            );
+            onClose();
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -65,7 +86,12 @@ export function AchievementModal({ open, initialItem, onClose, onSave }: Achieve
                     <h3 className="text-title-card font-semibold text-on-surface">
                         {initialItem ? "تعديل الإنجاز" : "إضافة إنجاز جديد"}
                     </h3>
-                    <button type="button" onClick={onClose} className="text-on-surface-variant hover:text-on-surface transition-colors">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={submitting}
+                        className="text-on-surface-variant hover:text-on-surface transition-colors disabled:opacity-50"
+                    >
                         <X size={20} />
                     </button>
                 </div>
@@ -78,9 +104,10 @@ export function AchievementModal({ open, initialItem, onClose, onSave }: Achieve
                         <input
                             type="text"
                             required
+                            disabled={submitting}
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full px-3 py-2 border border-outline-variant rounded-interactive bg-surface-container-low text-on-surface focus:outline-none focus:border-primary"
+                            className="w-full px-3 py-2 border border-outline-variant rounded-interactive bg-surface-container-low text-on-surface focus:outline-none focus:border-primary disabled:opacity-60"
                             placeholder="مثال: تجهيز مستشفى كفر شكر بالعلاج البيولوجي"
                         />
                     </div>
@@ -92,14 +119,15 @@ export function AchievementModal({ open, initialItem, onClose, onSave }: Achieve
                         <textarea
                             rows={3}
                             required
+                            disabled={submitting}
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="w-full px-3 py-2 border border-outline-variant rounded-interactive bg-surface-container-low text-on-surface focus:outline-none focus:border-primary"
+                            className="w-full px-3 py-2 border border-outline-variant rounded-interactive bg-surface-container-low text-on-surface focus:outline-none focus:border-primary disabled:opacity-60"
                             placeholder="تفاصيل ما تم إنجازه..."
                         />
                     </div>
 
-                    {/* Image File Upload Section */}
+                    {/* رفع صورة الإنجاز */}
                     <div>
                         <label className="block text-body-small font-medium text-on-surface-variant mb-1">
                             صورة الإنجاز
@@ -109,27 +137,30 @@ export function AchievementModal({ open, initialItem, onClose, onSave }: Achieve
                             type="file"
                             accept="image/*"
                             onChange={handleFileChange}
+                            disabled={submitting}
                             className="hidden"
                             id="achievement-image-upload"
                         />
 
-                        {imageUrl ? (
+                        {previewUrl ? (
                             <div className="relative w-full h-40 rounded-interactive overflow-hidden border border-outline-variant bg-surface-container-high group">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={imageUrl} alt="معاينة الصورة" className="w-full h-full object-cover" />
+                                <img src={previewUrl} alt="معاينة الصورة" className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                     <button
                                         type="button"
+                                        disabled={submitting}
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="p-2 bg-surface rounded-full text-on-surface hover:bg-surface-container transition-colors"
+                                        className="p-2 bg-surface rounded-full text-on-surface hover:bg-surface-container transition-colors disabled:opacity-50"
                                         title="تغيير الصورة"
                                     >
                                         <Upload size={16} />
                                     </button>
                                     <button
                                         type="button"
+                                        disabled={submitting}
                                         onClick={handleRemoveImage}
-                                        className="p-2 bg-error-container rounded-full text-error hover:bg-error/20 transition-colors"
+                                        className="p-2 bg-error-container rounded-full text-error hover:bg-error/20 transition-colors disabled:opacity-50"
                                         title="حذف الصورة"
                                     >
                                         <Trash2 size={16} />
@@ -152,15 +183,18 @@ export function AchievementModal({ open, initialItem, onClose, onSave }: Achieve
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 border border-outline-variant rounded-interactive text-body-small font-medium text-on-surface-variant hover:bg-surface-container transition-colors"
+                            disabled={submitting}
+                            className="px-4 py-2 border border-outline-variant rounded-interactive text-body-small font-medium text-on-surface-variant hover:bg-surface-container transition-colors disabled:opacity-50"
                         >
                             إلغاء
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-primary text-on-primary rounded-interactive text-body-small font-medium hover:opacity-90 transition-opacity"
+                            disabled={submitting}
+                            className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-interactive text-body-small font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                         >
-                            حفظ
+                            {submitting && <Loader2 size={16} className="animate-spin" />}
+                            <span>حفظ</span>
                         </button>
                     </div>
                 </form>

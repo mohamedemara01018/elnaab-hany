@@ -2,24 +2,48 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowRight, CheckCircle, Mail } from "lucide-react";
-
-
-
+import { ArrowRight, CheckCircle, Mail, ArrowLeft } from "lucide-react";
+import { authService } from "@/services/auth.service";
+import { useDispatch } from "react-redux";
+import { IToastificationType, toastify } from "@/store/slices/toastificationSlice";
+import { DURATION } from "@/utils/constant.utils";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [sent, setSent] = useState(false);
 
-    function handleSubmit(e: React.FormEvent) {
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    const notify = (message: string, type: IToastificationType, duration: number = DURATION) => {
+        dispatch(toastify({ message, type, duration }));
+    };
+
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setSubmitting(true);
-        // ضع هنا استدعاء الـ API الفعلي لإرسال رابط إعادة التعيين
-        window.setTimeout(() => {
+
+        try {
+            const response = await authService.forgotPassword({ email });
+
+            if (response.isSuccess) {
+                notify(response.message || "تم إرسال كود التحقق إلى بريدك الإلكتروني بنجاح", "success");
+                setSent(true);
+            } else {
+                notify(response.message || "حدث خطأ، يرجى التأكد من البيانات.", "error");
+            }
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                notify(err.message, "error");
+            } else {
+                notify("حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.", "error");
+            }
+        } finally {
             setSubmitting(false);
-            setSent(true);
-        }, 900);
+        }
     }
 
     return (
@@ -57,7 +81,7 @@ export default function ForgotPasswordPage() {
                                     }}
                                 />
                                 <p className="text-body-small text-on-surface-variant mt-4">
-                                    أدخل بريدك الإلكتروني المسجل، وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.
+                                    أدخل بريدك الإلكتروني المسجل، وسنرسل لك كود التحقق لإعادة تعيين كلمة المرور.
                                 </p>
                             </div>
 
@@ -77,7 +101,7 @@ export default function ForgotPasswordPage() {
                                             className="input-field px-3.5 py-3 pe-11 text-sm font-body text-on-surface w-full"
                                         />
                                         <span className="absolute inset-y-0 end-3.5 flex items-center text-outline pointer-events-none">
-                                            <Mail />
+                                            <Mail className="w-4 h-4" />
                                         </span>
                                     </div>
                                 </label>
@@ -91,18 +115,19 @@ export default function ForgotPasswordPage() {
                                 >
                                     {submitting ? "جارٍ الإرسال..." : (
                                         <>
-                                            <span>←</span> إرسال رابط إعادة التعيين
+                                            <ArrowLeft className="w-4 h-4" />
+                                            <span>إرسال كود التحقق</span>
                                         </>
                                     )}
                                 </motion.button>
 
-                                <a
+                                <Link
                                     href="/login"
-                                    className="flex items-center justify-center gap-1.5 text-sm font-display font-bold text-primary mt-1"
+                                    className="flex items-center justify-center gap-1.5 text-sm font-display font-bold text-primary mt-1 hover:underline"
                                 >
-                                    <ArrowRight />
+                                    <ArrowRight className="w-4 h-4" />
                                     العودة إلى تسجيل الدخول
-                                </a>
+                                </Link>
                             </form>
                         </motion.div>
                     ) : (
@@ -124,19 +149,31 @@ export default function ForgotPasswordPage() {
                                     color: "var(--color-on-primary-container)",
                                 }}
                             >
-                                <CheckCircle />
+                                <CheckCircle className="w-8 h-8" />
                             </motion.div>
 
                             <h1 className="font-display text-xl font-bold mt-5 text-on-surface">
-                                تم إرسال الرابط بنجاح
+                                تم إرسال كود التحقق بنجاح
                             </h1>
                             <p className="text-body-small text-on-surface-variant mt-3">
-                                تحقق من بريدك الإلكتروني
+                                تحقق من صندوق الوارد في بريدك الإلكتروني
                                 <span className="font-bold text-on-surface"> {email || "المسجل"} </span>
-                                واتبع التعليمات لإعادة تعيين كلمة المرور. قد تستغرق الرسالة بضع دقائق للوصول.
+                                للحصول على كود التحقق لإعادة تعيين كلمة المرور.
                             </p>
 
                             <div className="flex flex-col gap-3 mt-7">
+                                {/* زر الانقال المباشر مع البريد كـ Query Param */}
+                                <motion.button
+                                    whileHover={{ scale: 1.01 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    type="button"
+                                    onClick={() => router.push(`/verify-code?email=${encodeURIComponent(email)}`)}
+                                    className="btn-primary py-3.5 font-display font-bold text-sm inline-flex items-center justify-center gap-2"
+                                >
+                                    <ArrowLeft className="w-4 h-4" />
+                                    <span>إدخال كود التحقق</span>
+                                </motion.button>
+
                                 <motion.button
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.98 }}
@@ -144,15 +181,16 @@ export default function ForgotPasswordPage() {
                                     onClick={() => setSent(false)}
                                     className="btn-outline py-3.5 font-display font-bold text-sm"
                                 >
-                                    إرسال الرابط مرة أخرى
+                                    تغيير البريد الإلكتروني
                                 </motion.button>
-                                <a
+
+                                <Link
                                     href="/login"
-                                    className="flex items-center justify-center gap-1.5 text-sm font-display font-bold text-primary"
+                                    className="flex items-center justify-center gap-1.5 text-sm font-display font-bold text-primary hover:underline mt-1"
                                 >
-                                    <ArrowRight />
+                                    <ArrowRight className="w-4 h-4" />
                                     العودة إلى تسجيل الدخول
-                                </a>
+                                </Link>
                             </div>
                         </motion.div>
                     )}

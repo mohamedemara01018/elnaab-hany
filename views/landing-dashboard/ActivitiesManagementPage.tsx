@@ -1,40 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, Loader2 } from "lucide-react";
 import { ActivityItem, ActivityItemRow } from "@/components/landing-dashboard/activities-management-dashboard-page/Activityitemrow";
 import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
 import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
 import { ActivityModal } from "@/modals/Activitymodal";
 import ConfirmDialog from "@/components/ui/Confirmdialog";
-
-const INITIAL_ITEMS: ActivityItem[] = [
-    {
-        id: "health",
-        order: 1,
-        title: "الخدمات الصحية",
-        description: "متابعة الملفات الصحية ودعم المواطنين في الحصول على الخدمات الطبية.",
-        imageUrl: "/images/activities/health.jpg",
-    },
-    {
-        id: "sports",
-        order: 2,
-        title: "الرياضة ودعم الشباب",
-        description: "دعم الرياضة والمؤسسات الرياضية وتكريم الفائزين بالبطولات.",
-        imageUrl: "/images/activities/sports.jpg",
-    },
-    {
-        id: "charity",
-        order: 3,
-        title: "العمل الخيري",
-        description: "مبادرات مجتمعية وخدمات تستهدف أبناء الدائرة والأسر الأكثر احتياجاً.",
-        imageUrl: "/images/activities/charity.jpg",
-    },
-];
+import { activitiesService } from "@/services/activities.service";
+import { Activity } from "@/types/activities.types";
+import ImageModal from "@/components/ui/ImageModal";
 
 export default function ActivitiesManagementPage() {
-    const [items, setItems] = useState<ActivityItem[]>(INITIAL_ITEMS);
-    const [saving, setSaving] = useState(false);
+    const [items, setItems] = useState<ActivityItem[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [saving, setSaving] = useState<boolean>(false);
+    const [deleting, setDeleting] = useState<boolean>(false);
 
     // حالة التحكم بـ ActivityModal
     const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
@@ -42,6 +23,36 @@ export default function ActivitiesManagementPage() {
 
     // حالة التحكم بـ ConfirmDialog الخاص بالحذف
     const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+
+    // حالة التحكم بـ ImageModal لمعاينة الصور
+    const [previewImage, setPreviewImage] = useState<{ src: string; title: string } | null>(null);
+
+    // Fetch data from API
+    const fetchActivities = async () => {
+        try {
+            setLoading(true);
+            const res = await activitiesService.getAll();
+            if (res.isSuccess && Array.isArray(res.value)) {
+                const mappedItems: ActivityItem[] = res.value.map((item: Activity, index: number) => ({
+                    id: String(item.id),
+                    order: index + 1,
+                    title: item.title,
+                    description: item.description,
+                    imageUrl: item.mediaUrl,
+                }));
+                setItems(mappedItems);
+            }
+        } catch (error) {
+            console.error("Error fetching activities:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchActivities();
+    }, []);
 
     const openAddModal = () => {
         setActiveItem(undefined);
@@ -62,24 +73,44 @@ export default function ActivitiesManagementPage() {
         setDeletingItemId(id);
     };
 
-    const handleConfirmRemove = () => {
-        if (!deletingItemId) return;
-        setItems((prev) =>
-            prev
-                .filter((item) => item.id !== deletingItemId)
-                .map((item, index) => ({ ...item, order: index + 1 }))
-        );
-        setDeletingItemId(null);
+    const handlePreviewImage = (src: string, title: string) => {
+        setPreviewImage({ src, title });
     };
 
-    const handleModalSave = (item: Omit<ActivityItem, "order">) => {
-        setItems((prev) => {
-            const exists = prev.some((p) => p.id === item.id);
-            if (exists) {
-                return prev.map((p) => (p.id === item.id ? { ...p, ...item } : p));
+    const handleConfirmRemove = async () => {
+        if (!deletingItemId) return;
+        try {
+            setDeleting(true);
+            await activitiesService.delete(Number(deletingItemId));
+            await fetchActivities();
+        } catch (error) {
+            console.error("Error deleting activity:", error);
+        } finally {
+            setDeleting(false);
+            setDeletingItemId(null);
+        }
+    };
+
+    const handleModalSave = async (data: Omit<ActivityItem, "order">, imageFile?: File) => {
+        try {
+            if (modalMode === "add") {
+                await activitiesService.create({
+                    Title: data.title,
+                    Description: data.description,
+                    Image: imageFile,
+                });
+            } else if (modalMode === "edit") {
+                await activitiesService.update(Number(data.id), {
+                    Title: data.title,
+                    Description: data.description,
+                    Image: imageFile,
+                });
             }
-            return [...prev, { ...item, order: prev.length + 1 }];
-        });
+            await fetchActivities();
+            closeModal();
+        } catch (error) {
+            console.error("Error saving activity:", error);
+        }
     };
 
     const handleSave = () => {
@@ -114,31 +145,34 @@ export default function ActivitiesManagementPage() {
                         قم بإدارة بطاقات مجالات العمل والأنشطة التي تظهر في الواجهة الرئيسية للموقع.
                     </p>
 
-                    <div className="flex flex-col gap-3">
-                        {items.map((item) => (
-                            <ActivityItemRow
-                                key={item.id}
-                                item={item}
-                                onEdit={openEditModal}
-                                onRemove={handleRemove}
-                            />
-                        ))}
+                    {loading ? (
+                        <div className="flex items-center justify-center py-12 text-on-surface-variant gap-2">
+                            <Loader2 className="animate-spin" size={20} />
+                            <span>جاري تحميل البيانات...</span>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            {items.map((item) => (
+                                <ActivityItemRow
+                                    key={item.id}
+                                    item={item}
+                                    onEdit={openEditModal}
+                                    onRemove={handleRemove}
+                                    onPreviewImage={handlePreviewImage}
+                                />
+                            ))}
 
-                        {items.length === 0 && (
-                            <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
-                                لا توجد مجالات مضافة بعد. ابدأ بإضافة أول مجال عمل.
-                            </div>
-                        )}
-                    </div>
+                            {items.length === 0 && (
+                                <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
+                                    لا توجد مجالات مضافة بعد. ابدأ بإضافة أول مجال عمل.
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </section>
             </div>
 
-            <SaveBar
-                helperText="التغييرات تظهر في الموقع فور الحفظ."
-                onSave={handleSave}
-                onDiscard={() => setItems(INITIAL_ITEMS)}
-                saving={saving}
-            />
+            
 
             <ActivityModal
                 open={modalMode !== null}
@@ -155,11 +189,19 @@ export default function ActivitiesManagementPage() {
                         هل أنت تأكد من حذف مجال <strong>&quot;{targetDeleteItem?.title}&quot;</strong>؟ لا يمكنك التراجع عن هذه الخطوة.
                     </span>
                 }
-                confirmLabel="حذف"
+                confirmLabel={deleting ? "جاري الحذف..." : "حذف"}
                 cancelLabel="إلغاء"
                 variant="danger"
                 onConfirm={handleConfirmRemove}
                 onClose={() => setDeletingItemId(null)}
+            />
+
+            {/* Image Preview Modal */}
+            <ImageModal
+                isOpen={previewImage !== null}
+                src={previewImage?.src || ""}
+                alt={previewImage?.title || "معاينة الصورة"}
+                onClose={() => setPreviewImage(null)}
             />
         </>
     );

@@ -9,6 +9,7 @@ import ComplaintsManagementPage from './employee-dashboard/ComplaintsManagementP
 enum RoleType {
     ADMIN = 'admin',
     DEPUTY = 'deputy',
+    LANDING_DASH = 'landing_dash',
     LANDING = 'landing',
     EMPLOYEE = 'employee',
 }
@@ -16,10 +17,10 @@ enum RoleType {
 export default function HomePage() {
 
     // أو الإبقاء على const مع توضيح النوع المباشر
-    const currentRole: RoleType = RoleType.EMPLOYEE as RoleType;
+    const currentRole: RoleType = RoleType.LANDING_DASH as RoleType;
 
     switch (currentRole) {
-        case RoleType.LANDING:
+        case RoleType.LANDING_DASH:
             return (
                 <DashboardLayout
                     userName="أدمن هاني شحاتة"
@@ -27,6 +28,17 @@ export default function HomePage() {
                     NAV_ITEMS={NAV_ITEMS_MAHER_DASH}
                 >
                     <HeroManagementDashboardPage />
+                </DashboardLayout>
+            );
+
+        case RoleType.DEPUTY:
+            return (
+                <DashboardLayout
+                    userName="أدمن هاني شحاتة"
+                    userRole="المسؤول"
+                    NAV_ITEMS={[]}
+                >
+                    <div>deputy</div>
                 </DashboardLayout>
             );
 

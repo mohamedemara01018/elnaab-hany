@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Upload, Link as LinkIcon } from "lucide-react";
+import { X, Upload, Loader2 } from "lucide-react";
 import { BriefingRequestItem } from "@/components/landing-dashboard/briefing-requests-dashboard-page/BriefingRequestItemRow";
 import { Field, InputWithIcon, TextareaField } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
 
@@ -10,23 +10,30 @@ type ModalProps = {
     open: boolean;
     initialItem?: BriefingRequestItem;
     onClose: () => void;
-    onSave: (item: Omit<BriefingRequestItem, "order">) => void;
+    onSave: (
+        itemData: { title: string; description: string; media?: File | Blob },
+        id?: string
+    ) => Promise<void> | void;
 };
 
 export function BriefingRequestModal({ open, initialItem, onClose, onSave }: ModalProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [imageUrl, setImageUrl] = useState("");
+    const [previewUrl, setPreviewUrl] = useState("");
+    const [mediaFile, setMediaFile] = useState<File | null>(null);
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         if (initialItem) {
             setTitle(initialItem.title);
             setDescription(initialItem.description);
-            setImageUrl(initialItem.imageUrl || "");
+            setPreviewUrl(initialItem.imageUrl || "");
+            setMediaFile(null);
         } else {
             setTitle("");
             setDescription("");
-            setImageUrl("");
+            setPreviewUrl("");
+            setMediaFile(null);
         }
     }, [initialItem, open]);
 
@@ -44,20 +51,30 @@ export function BriefingRequestModal({ open, initialItem, onClose, onSave }: Mod
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            const previewUrl = URL.createObjectURL(file);
-            setImageUrl(previewUrl);
+            setMediaFile(file);
+            const objectUrl = URL.createObjectURL(file);
+            setPreviewUrl(objectUrl);
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({
-            id: initialItem?.id || Date.now().toString(),
-            title,
-            description,
-            imageUrl,
-        });
-        onClose();
+        try {
+            setSubmitting(true);
+            await onSave(
+                {
+                    title,
+                    description,
+                    media: mediaFile || undefined,
+                },
+                initialItem?.id
+            );
+            onClose();
+        } catch {
+            // Error handling is handled in page via toastify
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -100,31 +117,34 @@ export function BriefingRequestModal({ open, initialItem, onClose, onSave }: Mod
                             />
                         </Field>
 
-
-
-                        <div className="flex items-center gap-3 my-1">
-                            <div className="h-px flex-1 bg-outline-variant" />
-                            <span className="text-caption text-on-surface-variant">أو قم برفع صورة</span>
-                            <div className="h-px flex-1 bg-outline-variant" />
-                        </div>
-
                         <Field label="صورة المعاينة">
-                            <label className="flex flex-col items-center justify-center gap-2 p-5 rounded-interactive border-2 border-dashed border-outline-variant hover:border-primary/50 bg-surface-container-low cursor-pointer transition-colors">
-                                <div className="p-3 rounded-full bg-surface-container-high text-on-surface-variant">
-                                    <Upload size={18} />
-                                </div>
-                                <span className="text-body-small font-semibold text-primary">اختيار صورة من الجهاز</span>
+                            <label className="flex flex-col items-center justify-center gap-2 p-5 rounded-interactive border-2 border-dashed border-outline-variant hover:border-primary/50 bg-surface-container-low cursor-pointer transition-colors relative overflow-hidden">
+                                {previewUrl ? (
+                                    <div className="flex flex-col items-center gap-2">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={previewUrl} alt="المعاينة" className="max-h-32 rounded-md object-cover mb-2" />
+                                        <span className="text-body-small font-semibold text-primary">تغيير الصورة</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="p-3 rounded-full bg-surface-container-high text-on-surface-variant">
+                                            <Upload size={18} />
+                                        </div>
+                                        <span className="text-body-small font-semibold text-primary">اختيار صورة من الجهاز</span>
+                                    </>
+                                )}
                                 <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                             </label>
                         </Field>
                     </div>
 
                     <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant bg-surface-container-low rounded-b-card">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-body-small font-semibold text-on-surface-variant hover:bg-surface-container rounded-interactive transition-colors">
+                        <button type="button" onClick={onClose} disabled={submitting} className="px-4 py-2 text-body-small font-semibold text-on-surface-variant hover:bg-surface-container rounded-interactive transition-colors disabled:opacity-50">
                             إلغاء
                         </button>
-                        <button type="submit" className="px-5 py-2 text-body-small font-semibold bg-primary text-on-primary rounded-interactive hover:opacity-90 transition-opacity">
-                            حفظ الطلب
+                        <button type="submit" disabled={submitting} className="flex items-center gap-2 px-5 py-2 text-body-small font-semibold bg-primary text-on-primary rounded-interactive hover:opacity-90 transition-opacity disabled:opacity-50">
+                            {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            <span>حفظ الطلب</span>
                         </button>
                     </div>
                 </form>
