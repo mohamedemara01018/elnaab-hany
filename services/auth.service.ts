@@ -6,7 +6,9 @@ import {
     VerifyResetCodePayload,
     VerifyResetCodeResponse,
     ResetPasswordPayload,
-    ResetPasswordResponse
+    ResetPasswordResponse,
+    ChangePasswordPayload,
+    ChangePasswordResponse
 } from "@/types/auth.types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -86,5 +88,30 @@ export const authService = {
         }
 
         return data as ResetPasswordResponse;
+    },
+
+    changePassword: async (payload: ChangePasswordPayload): Promise<ChangePasswordResponse> => {
+        const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+        console.log('token', token)
+        const response = await fetch(`${BASE_URL}/ChangePassword`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "accept": "*/*",
+                ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify(payload),
+        });
+
+        // Read raw text to handle empty body (204 or unexpected empty response)
+        const responseText = await response.text();
+        const data = responseText ? JSON.parse(responseText) : null;
+
+        console.log('data', data);
+        if (!response.ok) {
+            throw new Error(data?.message || `HTTP error! status: ${response.status}`);
+        }
+
+        return data as ChangePasswordResponse;
     },
 };

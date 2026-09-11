@@ -1,13 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Section } from "@/components/ui/section";
 import { CitizenRequestForm } from "@/components/landing-page/citizen-request-form";
 import { fadeUp, revealViewport } from "@/lib/motion-variants";
+import { departmentService } from "@/services/department.service";
+import { organizationService } from "@/services/organization.service";
+import { Department } from "@/types/department.types";
+import { Organization } from "@/types/organization.types";
 
 export function Complaints() {
   const [formTab, setFormTab] = useState<"complaint" | "proposal">("complaint");
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [deptData, orgData] = await Promise.all([
+          departmentService.getDepartments(),
+          organizationService.getOrganizations(),
+        ]);
+        setDepartments(deptData || []);
+        setOrganizations(orgData || []);
+      } catch (error) {
+        console.error("Failed to load departments or organizations:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
 
   return (
     <Section id="complaints" className="bg-surface-container-low">
@@ -74,7 +102,12 @@ export function Complaints() {
           id={`panel-${formTab}`}
           aria-labelledby={`tab-${formTab}`}
         >
-          <CitizenRequestForm variant={formTab} />
+          <CitizenRequestForm
+            variant={formTab}
+            departments={departments}
+            organizations={organizations}
+            loading={loading}
+          />
         </div>
       </div>
     </Section>

@@ -7,16 +7,33 @@ interface UploadFieldProps {
   label: string;
   optional?: boolean;
   hint: string;
+  onChange?: (file: File | null) => void;
 }
 
-export function UploadField({ label, optional, hint }: UploadFieldProps) {
-  const [fileName, setFileName] = useState("");
+export function UploadField({ label, optional, hint, onChange }: UploadFieldProps) {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedFile(file);
+    if (onChange) onChange(file);
+  };
+
+  const handleRemove = () => {
+    setSelectedFile(null);
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+    if (onChange) onChange(null);
+  };
 
   return (
     <label className="flex flex-col gap-2 font-display text-sm font-bold text-on-surface">
-      {label}
-      {optional && <span className="font-normal text-on-surface-variant text-xs">(اختياري)</span>}
+      <div className="flex items-center gap-1">
+        <span>{label}</span>
+        {optional && <span className="font-normal text-on-surface-variant text-xs">(اختياري)</span>}
+      </div>
 
       <motion.div
         onClick={() => inputRef.current?.click()}
@@ -34,18 +51,18 @@ export function UploadField({ label, optional, hint }: UploadFieldProps) {
       >
         <div className="text-xl">📎</div>
         <strong>اضغط لاختيار مرفق</strong>
-        <span className="text-body-small">{hint}</span>
+        <span className="text-body-small font-normal">{hint}</span>
       </motion.div>
 
       <input
         ref={inputRef}
         type="file"
         hidden
-        onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
+        onChange={handleFileChange}
       />
 
       <AnimatePresence>
-        {fileName && (
+        {selectedFile && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
@@ -53,11 +70,11 @@ export function UploadField({ label, optional, hint }: UploadFieldProps) {
             transition={{ duration: 0.2 }}
             className="flex justify-between items-center bg-surface-container rounded-md px-3.5 py-2.5 text-sm overflow-hidden"
           >
-            <span>{fileName}</span>
+            <span className="truncate max-w-[80%] font-normal">{selectedFile.name}</span>
             <button
               type="button"
-              className="border-none bg-transparent text-error font-bold cursor-pointer"
-              onClick={() => setFileName("")}
+              className="border-none bg-transparent text-error font-bold cursor-pointer hover:opacity-80 shrink-0"
+              onClick={handleRemove}
             >
               إزالة ×
             </button>

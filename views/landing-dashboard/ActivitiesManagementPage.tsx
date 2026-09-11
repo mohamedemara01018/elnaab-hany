@@ -15,6 +15,7 @@ export default function ActivitiesManagementPage() {
     const [items, setItems] = useState<ActivityItem[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [saving, setSaving] = useState<boolean>(false);
+    const [modalSubmitting, setModalSubmitting] = useState<boolean>(false);
     const [deleting, setDeleting] = useState<boolean>(false);
 
     // حالة التحكم بـ ActivityModal
@@ -93,6 +94,7 @@ export default function ActivitiesManagementPage() {
 
     const handleModalSave = async (data: Omit<ActivityItem, "order">, imageFile?: File) => {
         try {
+            setModalSubmitting(true);
             if (modalMode === "add") {
                 await activitiesService.create({
                     Title: data.title,
@@ -110,6 +112,8 @@ export default function ActivitiesManagementPage() {
             closeModal();
         } catch (error) {
             console.error("Error saving activity:", error);
+        } finally {
+            setModalSubmitting(false);
         }
     };
 
@@ -172,10 +176,9 @@ export default function ActivitiesManagementPage() {
                 </section>
             </div>
 
-            
-
             <ActivityModal
                 open={modalMode !== null}
+                loading={modalSubmitting}
                 initialItem={activeItem}
                 onClose={closeModal}
                 onSave={handleModalSave}

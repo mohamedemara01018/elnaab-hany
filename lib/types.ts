@@ -22,10 +22,14 @@ export interface WorkItem {
   n: string;
   title: string;
   body: string;
+  imageUrl?: string;
+  mediaUrl?: string;
 }
 
 export interface VideoItem {
   title: string;
+  url?: string;
+  mediaUrl?: string;
 }
 
 export interface GalleryItem {
@@ -33,6 +37,8 @@ export interface GalleryItem {
   title: string;
   body: string;
   type: "image" | "video";
+  image?: string;
+  mediaUrl?: string;
 }
 
 export interface ContactCard {

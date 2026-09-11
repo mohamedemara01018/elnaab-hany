@@ -16,3 +16,13 @@ export function getInitials(firstName: string, lastName: string) {
     const last = lastName?.charAt(0) ?? "";
     return (first + last).toUpperCase() || "?";
 }
+
+export function getMediaUrl(url?: string | null): string {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:") || url.startsWith("blob:")) {
+        return url;
+    }
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+    const cleanUrl = url.startsWith("/") ? url : `/${url}`;
+    return `${baseUrl}${cleanUrl}`;
+}

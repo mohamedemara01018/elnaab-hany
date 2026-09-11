@@ -3,18 +3,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Upload, Trash2, Image as ImageIcon } from "lucide-react";
+import { X, Upload, Trash2, Image as ImageIcon, Loader2 } from "lucide-react";
 import { ActivityItem } from "@/components/landing-dashboard/activities-management-dashboard-page/Activityitemrow";
 import { Field, InputWithIcon, TextareaField } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
 
 type ModalProps = {
     open: boolean;
+    loading?: boolean;
     initialItem?: ActivityItem;
     onClose: () => void;
     onSave: (item: Omit<ActivityItem, "order">, imageFile?: File) => void;
 };
 
-export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps) {
+export function ActivityModal({ open, loading = false, initialItem, onClose, onSave }: ModalProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [imageUrl, setImageUrl] = useState("");
@@ -39,11 +40,11 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
     useEffect(() => {
         if (!open) return;
         const handleKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
+            if (e.key === "Escape" && !loading) onClose();
         };
         document.addEventListener("keydown", handleKey);
         return () => document.removeEventListener("keydown", handleKey);
-    }, [open, onClose]);
+    }, [open, onClose, loading]);
 
     if (!open) return null;
 
@@ -64,6 +65,7 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (loading) return;
         onSave(
             {
                 id: initialItem?.id || "",
@@ -86,8 +88,9 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
             <button
                 type="button"
                 aria-label="إغلاق"
+                disabled={loading}
                 onClick={onClose}
-                className="absolute inset-0 bg-slate-dark/50 backdrop-blur-[2px]"
+                className="absolute inset-0 bg-slate-dark/50 backdrop-blur-[2px] disabled:cursor-not-allowed"
             />
 
             {/* Dialog */}
@@ -106,8 +109,9 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
                         <button
                             type="button"
                             onClick={onClose}
+                            disabled={loading}
                             aria-label="إغلاق"
-                            className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors"
+                            className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <X size={16} />
                         </button>
@@ -121,6 +125,7 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
                                 placeholder="مثال: الخدمات الصحية"
                                 required
+                                disabled={loading}
                             />
                         </Field>
 
@@ -131,6 +136,7 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
                                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
                                 placeholder="اكتب وصفاً موجزاً للمجال..."
                                 required
+                                disabled={loading}
                             />
                         </Field>
 
@@ -143,28 +149,32 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
                                         alt="معاينة الصورة"
                                         className="w-full h-full object-cover"
                                     />
-                                    <div className="absolute inset-0 bg-slate-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                        <label className="cursor-pointer p-2 rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors">
-                                            <Upload size={16} />
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                className="hidden"
-                                                onChange={handleFileChange}
-                                            />
-                                        </label>
-                                        <button
-                                            type="button"
-                                            onClick={handleRemoveImage}
-                                            className="p-2 rounded-full bg-error/90 text-on-error hover:bg-error transition-colors"
-                                            aria-label="حذف الصورة"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
+                                    {!loading && (
+                                        <div className="absolute inset-0 bg-slate-dark/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                            <label className="cursor-pointer p-2 rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors">
+                                                <Upload size={16} />
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={handleFileChange}
+                                                    disabled={loading}
+                                                />
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={handleRemoveImage}
+                                                className="p-2 rounded-full bg-error/90 text-on-error hover:bg-error transition-colors"
+                                                aria-label="حذف الصورة"
+                                                disabled={loading}
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
-                                <label className="flex flex-col items-center justify-center gap-2 p-6 rounded-interactive border-2 border-dashed border-outline-variant hover:border-primary/50 bg-surface-container-low cursor-pointer transition-colors group">
+                                <label className={`flex flex-col items-center justify-center gap-2 p-6 rounded-interactive border-2 border-dashed border-outline-variant bg-surface-container-low transition-colors group ${loading ? "opacity-50 cursor-not-allowed" : "hover:border-primary/50 cursor-pointer"}`}>
                                     <div className="p-3 rounded-full bg-surface-container-high group-hover:bg-primary/10 text-on-surface-variant group-hover:text-primary transition-colors">
                                         <ImageIcon size={20} />
                                     </div>
@@ -177,6 +187,7 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
                                         accept="image/*"
                                         className="hidden"
                                         onChange={handleFileChange}
+                                        disabled={loading}
                                     />
                                 </label>
                             )}
@@ -188,15 +199,18 @@ export function ActivityModal({ open, initialItem, onClose, onSave }: ModalProps
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-body-small font-semibold text-on-surface-variant hover:bg-surface-container rounded-interactive transition-colors"
+                            disabled={loading}
+                            className="px-4 py-2 text-body-small font-semibold text-on-surface-variant hover:bg-surface-container rounded-interactive transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             إلغاء
                         </button>
                         <button
                             type="submit"
-                            className="px-5 py-2 text-body-small font-semibold bg-primary text-on-primary rounded-interactive hover:opacity-90 transition-opacity"
+                            disabled={loading}
+                            className="flex items-center gap-2 px-5 py-2 text-body-small font-semibold bg-primary text-on-primary rounded-interactive hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            حفظ
+                            {loading && <Loader2 size={16} className="animate-spin" />}
+                            <span>{loading ? "جاري الحفظ..." : "حفظ"}</span>
                         </button>
                     </div>
                 </form>

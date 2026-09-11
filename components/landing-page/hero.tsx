@@ -1,11 +1,28 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ImagePlaceholder } from "@/components/ui/media-placeholder";
-import { staggerContainer, fadeUp, scaleIn } from "@/lib/motion-variants";
-import img from '@/public/702718504_122221557020346497_6976720022155079154_n.jpg'
 import Image from "next/image";
-export function Hero() {
+import { staggerContainer, fadeUp, scaleIn } from "@/lib/motion-variants";
+import imgFallback from "@/public/702718504_122221557020346497_6976720022155079154_n.jpg";
+import { HeroInfoData, GetHeroInfoResponse } from "@/types/hero.types";
+
+interface HeroProps {
+  data?: HeroInfoData | GetHeroInfoResponse | null;
+}
+
+export function Hero({ data }: HeroProps) {
+  // Unwraps data whether it comes as raw HeroInfoData or inside GetHeroInfoResponse
+  const heroInfo: HeroInfoData | null =
+    data && "value" in data ? (data.value as HeroInfoData) : (data as HeroInfoData | null);
+
+  const name = heroInfo?.fullName || "هاني شحاتة";
+  const title = heroInfo?.title || "عضو مجلس النواب عن دائرة بنها وكفر شكر";
+  const description =
+    heroInfo?.bio ||
+    "منصة رسمية للتواصل مع المواطنين، تقديم الشكاوى والمقترحات، واستعراض أهم الملفات والأنشطة والزيارات.";
+  const siteTitle = heroInfo?.circle || "الموقع الرسمي";
+  const imageSrc = heroInfo?.mediaUrl || imgFallback;
+
   return (
     <section id="home" className="relative py-16 md:py-28 overflow-hidden">
       <motion.div
@@ -16,20 +33,20 @@ export function Hero() {
       >
         <div>
           <motion.span variants={fadeUp} className="text-label-overline inline-block mb-3">
-            الموقع الرسمي
+            {siteTitle}
           </motion.span>
 
           <motion.h1 variants={fadeUp} className="text-display-hero">
             النائب
-            <span className="block text-primary">هاني شحاتة</span>
+            <span className="block text-primary">{name}</span>
           </motion.h1>
 
           <motion.h2 variants={fadeUp} className="font-display text-lg md:text-xl font-medium text-secondary mt-3">
-            عضو مجلس النواب عن دائرة بنها وكفر شكر
+            {title}
           </motion.h2>
 
           <motion.p variants={fadeUp} className="text-body-main mt-4 max-w-md">
-            منصة رسمية للتواصل مع المواطنين، تقديم الشكاوى والمقترحات، واستعراض أهم الملفات والأنشطة والزيارات.
+            {description}
           </motion.p>
 
           <motion.div variants={fadeUp} className="flex flex-wrap gap-3.5 mt-7">
@@ -54,10 +71,17 @@ export function Hero() {
 
         <motion.div
           variants={scaleIn}
-          className="service-container border-4 border-surface-container-lowest overflow-hidden "
+          className="service-container border-4 border-surface-container-lowest overflow-hidden relative w-full h-[380px] md:h-[480px]"
           style={{ boxShadow: "var(--shadow-level-2)" }}
         >
-          <Image src={img} alt="النائب هاني شحاتة - عضو مجلس النواب" className="object-cover" priority />
+          <Image
+            src={imageSrc}
+            alt={`النائب ${name} - ${title}`}
+            fill
+            className="object-cover"
+            priority
+            unoptimized={typeof imageSrc === "string"}
+          />
         </motion.div>
       </motion.div>
 

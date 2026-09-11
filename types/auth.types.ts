@@ -55,3 +55,18 @@ export interface ResetPasswordResponse {
     value: string;
     message: string;
 }
+
+
+export interface ChangePasswordPayload {
+    currentPassword: string;
+    newPassword: string;
+    confirmNewPassword: string;
+}
+
+export interface ChangePasswordResponse {
+    isSuccess: boolean;
+    status: number;
+    error: string | null;
+    value: string | null;
+    message: string;
+}

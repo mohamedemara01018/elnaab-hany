@@ -1,21 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, TargetAndTransition } from "motion/react";
 import { NAV_LINKS } from "@/lib/data";
 import ToggleTheme from "../../ui/ToggleTheme";
 import UserImage from "../../ui/UserImage";
+import { HeroInfoData } from "@/types/hero.types";
+import { getMediaUrl } from "@/utils/functions.utils";
+import { heroService } from "@/services/hero.service";
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [heroInfo, setHeroInfo] = useState<HeroInfoData | null>(null);
 
-  // Animation settings for the desktop & mobile links
+  useEffect(() => {
+    async function fetchHero() {
+      try {
+        const response = await heroService.getHeroInfo();
+        if (response?.isSuccess && response?.value) {
+          setHeroInfo(response.value);
+        } else if (response?.value) {
+          setHeroInfo(response.value);
+        }
+      } catch (error) {
+        console.error("Failed to fetch hero info for Navbar:", error);
+      }
+    }
+
+    fetchHero();
+  }, []);
+
   const linkHoverAnimation: TargetAndTransition = {
     scale: 1.05,
     y: -2,
-    transition: { type: "spring", stiffness: 400, damping: 17 }
+    transition: { type: "spring", stiffness: 400, damping: 17 },
   };
   const linkTapAnimation = { scale: 0.95 };
+
+  const fullName = heroInfo?.fullName || "النائب هاني شحاتة";
+  const nameParts = fullName.split(" ");
+  const firstName = nameParts[0] || "";
+  const lastName = nameParts.slice(1).join(" ") || "";
+  const avatarUrl = getMediaUrl(heroInfo?.mediaUrl) || "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg";
 
   return (
     <motion.header
@@ -26,10 +52,17 @@ export function Navbar() {
     >
       <div className="wrapper flex items-center justify-between gap-4 py-4 relative">
         <a href="#home" aria-label="الصفحة الرئيسية" className="flex gap-4 items-center justify-center">
-          <UserImage avatarUrl="https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg" firstName="هاني" lastName="شحاتة" className="w-10 h-10" />
+          <UserImage
+            avatarUrl={avatarUrl}
+            firstName={firstName}
+            lastName={lastName}
+            className="w-10 h-10"
+          />
           <div className="flex flex-col">
-            <strong className="font-display text-base">النائب هاني شحاتة</strong>
-            <small className="text-xs text-on-surface-variant">الموقع الرسمي</small>
+            <strong className="font-display text-base">{fullName}</strong>
+            <small className="text-xs text-on-surface-variant">
+              {heroInfo?.title || "الموقع الرسمي"}
+            </small>
           </div>
         </a>
 
@@ -76,7 +109,7 @@ export function Navbar() {
                   key={l.href}
                   href={l.href}
                   className="nav-link py-1 text-on-surface hover:text-primary transition-colors"
-                  whileHover={{ x: -6 }} // Moves slightly left for RTL layout hover
+                  whileHover={{ x: -6 }}
                   whileTap={linkTapAnimation}
                   onClick={() => setMenuOpen(false)}
                 >

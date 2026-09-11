@@ -1,3 +1,4 @@
+
 'use client';
 
 import { DashboardLayout } from '@/components/layout/dashboard/DashboardLayout';
@@ -17,7 +18,7 @@ enum RoleType {
 export default function HomePage() {
 
     // أو الإبقاء على const مع توضيح النوع المباشر
-    const currentRole: RoleType = RoleType.LANDING_DASH as RoleType;
+    const currentRole: RoleType = RoleType.LANDING as RoleType;
 
     switch (currentRole) {
         case RoleType.LANDING_DASH:

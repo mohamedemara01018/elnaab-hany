@@ -20,12 +20,12 @@ export const NAV_ITEMS_MAHER_DASH = [
     { href: "/events", label: "أحدث الزيارات والفعاليات", icon: CalendarCheck },
     { href: "/activities", label: "الأنشطة والفعاليات", icon: CalendarDays },
     { href: "/videos", label: "اللقاءات والفيديوهات", icon: Video },
-    { href: "/settings", label: "الإعدادات", icon: Settings },
+    { href: "/change-password", label: "تغيير كلمة المرور", icon: Settings },
 ];
 
 export const NAV_ITEMS_EMPLOYEE_DASH = [
     { href: "/", label: "كل الشكاوى", icon: ClipboardList },
-    { href: "/settings", label: "إعدادات الشكاوى", icon: Settings },
+    { href: "/change-password", label: "تغيير كلمة المرور", icon: Settings },
 ];
 
 export const DURATION = 1500

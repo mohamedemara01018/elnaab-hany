@@ -1,35 +1,213 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
-import { User, Landmark, Share2, MapPin, Phone, MessageCircle, Link as LinkIcon, Camera, Trash2, Calendar, Clock, Home } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { User, Landmark, Share2, MapPin, Phone, MessageCircle, Link as LinkIcon, Camera, Trash2, Calendar, Clock, Home, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
 import { Field, InputWithIcon, SectionCard, TextareaField } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
 import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
+import { heroService } from "@/services/hero.service";
+import { UpdateHeroInfoPayload } from "@/types/hero.types";
+import { useDispatch } from "react-redux";
+import { toastify } from "@/store/slices/toastificationSlice";
 
 export default function HeroManagementDashboardPage() {
-    const [saving, setSaving] = useState(false);
-    const [profileImage, setProfileImage] = useState<string | null>(null);
+    const dispatch = useDispatch();
 
-    const handleSave = () => {
-        setSaving(true);
-        setTimeout(() => setSaving(false), 900);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [isImageRemoved, setIsImageRemoved] = useState(false);
+
+    // Initial state container to compare changes
+    const [initialState, setInitialState] = useState({
+        formData: {
+            fullName: "",
+            title: "",
+            birthOfDate: "",
+            address: "",
+            bio: "",
+            aboutPart1: "",
+            aboutPart2: "",
+            circle: "",
+            appointment: "",
+            officeLocation: "",
+            locationURL: "",
+            primaryPhone: "",
+            secondaryPhone: "",
+            whatsApp: "",
+            facebookLing: "",
+        },
+        profileImage: null as string | null,
+    });
+
+    const [formData, setFormData] = useState({
+        fullName: "",
+        title: "",
+        birthOfDate: "",
+        address: "",
+        bio: "",
+        aboutPart1: "",
+        aboutPart2: "",
+        circle: "",
+        appointment: "",
+        officeLocation: "",
+        locationURL: "",
+        primaryPhone: "",
+        secondaryPhone: "",
+        whatsApp: "",
+        facebookLing: "",
+    });
+
+    // Fetch data on mount
+    const fetchHeroData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await heroService.getHeroInfo();
+            if (response.isSuccess && response.value) {
+                const data = response.value;
+                const fetchedFormData = {
+                    fullName: data.fullName || "",
+                    title: data.title || "",
+                    birthOfDate: data.birthOfDate ? data.birthOfDate.split("T")[0] : "",
+                    address: data.address || "",
+                    bio: data.bio || "",
+                    aboutPart1: data.aboutPart1 || "",
+                    aboutPart2: data.aboutPart2 || "",
+                    circle: data.circle || "",
+                    appointment: data.appointment || "",
+                    officeLocation: data.officeLocation || "",
+                    locationURL: data.locationURL || "",
+                    primaryPhone: data.primaryPhone || "",
+                    secondaryPhone: data.secondaryPhone || "",
+                    whatsApp: data.whatsApp || "",
+                    facebookLing: data.facebookLing || "",
+                };
+
+                const mediaUrl = data.mediaUrl || null;
+
+                setFormData(fetchedFormData);
+                setProfileImage(mediaUrl);
+
+                // Save baseline data for comparison
+                setInitialState({
+                    formData: fetchedFormData,
+                    profileImage: mediaUrl,
+                });
+            }
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "حدث خطأ أثناء جلب البيانات الشخصية.";
+            dispatch(toastify({ message, type: "error" }));
+        } finally {
+            setLoading(false);
+            setIsImageRemoved(false);
+            setSelectedFile(null);
+        }
+    }, [dispatch]);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        fetchHeroData();
+    }, [fetchHeroData]);
+
+    // Check if any form fields or image state have changed
+    const isDirty = useMemo(() => {
+        const isFormChanged = JSON.stringify(formData) !== JSON.stringify(initialState.formData);
+        const isImageChanged = selectedFile !== null || isImageRemoved;
+        return isFormChanged || isImageChanged;
+    }, [formData, initialState, selectedFile, isImageRemoved]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (profileImage && profileImage.startsWith("blob:")) {
+                URL.revokeObjectURL(profileImage);
+            }
+            setSelectedFile(file);
+            setIsImageRemoved(false);
             const imageUrl = URL.createObjectURL(file);
             setProfileImage(imageUrl);
         }
     };
+
+    const handleRemoveImage = () => {
+        if (profileImage && profileImage.startsWith("blob:")) {
+            URL.revokeObjectURL(profileImage);
+        }
+        setProfileImage(null);
+        setSelectedFile(null);
+        setIsImageRemoved(true);
+    };
+
+    const handleSave = async () => {
+        if (!isDirty) return;
+
+        try {
+            setSaving(true);
+            const payload: UpdateHeroInfoPayload = {
+                FullName: formData.fullName,
+                Title: formData.title,
+                BirthOfDate: formData.birthOfDate || undefined,
+                Address: formData.address,
+                Bio: formData.bio,
+                AboutPart1: formData.aboutPart1,
+                AboutPart2: formData.aboutPart2,
+                Circle: formData.circle,
+                Appointment: formData.appointment,
+                OfficeLocation: formData.officeLocation,
+                LocationURL: formData.locationURL,
+                PrimaryPhone: formData.primaryPhone,
+                SecondaryPhone: formData.secondaryPhone,
+                WhatsApp: formData.whatsApp,
+                FacebookLing: formData.facebookLing,
+            };
+
+            if (selectedFile) {
+                payload.Media = selectedFile;
+            } else if (isImageRemoved) {
+                payload.Media = null as unknown as File;
+            }
+
+            const response = await heroService.updateHeroInfo(payload);
+            if (response.isSuccess) {
+                dispatch(toastify({ message: response.message || "تم حفظ البيانات بنجاح.", type: "success" }));
+                fetchHeroData();
+            } else {
+                dispatch(toastify({ message: response.message || "حدث خطأ أثناء حفظ البيانات.", type: "error" }));
+            }
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "حدث خطأ أثناء حفظ البيانات.";
+            dispatch(toastify({ message, type: "error" }));
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleDiscard = () => {
+        fetchHeroData();
+        dispatch(toastify({ message: "تم إلغاء التغييرات وإعادة جلب البيانات.", type: "info" }));
+    };
+
+    if (loading) {
+        return (
+            <div className="flex-1 flex items-center justify-center min-h-[400px]">
+                <Loader2 className="animate-spin text-primary" size={32} />
+            </div>
+        );
+    }
 
     return (
         <>
             <PageHeader
                 breadcrumb="إعدادات الموقع"
                 title="البيانات الشخصية"
-                lastSavedLabel="آخر حفظ: منذ دقيقتين"
+                lastSavedLabel="يتم التحديث مباشرة عند إجراء التغييرات"
             />
 
             <div className="flex-1 flex flex-col gap-6 px-6 md:px-10 pb-6">
@@ -64,7 +242,7 @@ export default function HeroManagementDashboardPage() {
                                 {profileImage && (
                                     <button
                                         type="button"
-                                        onClick={() => setProfileImage(null)}
+                                        onClick={handleRemoveImage}
                                         className="flex items-center gap-1.5 px-3 py-2 text-body-small font-medium text-error hover:bg-error/10 rounded-interactive transition-colors"
                                     >
                                         <Trash2 size={16} />
@@ -77,28 +255,29 @@ export default function HeroManagementDashboardPage() {
 
                     <div className="grid md:grid-cols-2 gap-5">
                         <Field label="الاسم بالكامل">
-                            <InputWithIcon defaultValue="هاني شحاتة" />
+                            <InputWithIcon name="fullName" value={formData.fullName} onChange={handleChange} />
                         </Field>
                         <Field label="المسمى الوظيفي / الصفة">
-                            <InputWithIcon defaultValue="عضو مجلس النواب المصري" />
+                            <InputWithIcon name="title" value={formData.title} onChange={handleChange} />
                         </Field>
                     </div>
 
-                    {/* الحقول الجديدة: تاريخ الميلاد ومحل الإقامة */}
                     <div className="grid md:grid-cols-2 gap-5">
                         <Field label="تاريخ الميلاد">
-                            <InputWithIcon type="date" defaultValue="1980-01-15" icon={<Calendar size={16} />} />
+                            <InputWithIcon type="date" name="birthOfDate" value={formData.birthOfDate} onChange={handleChange} icon={<Calendar size={16} />} />
                         </Field>
                         <Field label="محل إقامة النائب">
-                            <InputWithIcon defaultValue="الجيزة - جمهورية مصر العربية" icon={<Home size={16} />} />
+                            <InputWithIcon name="address" value={formData.address} onChange={handleChange} icon={<Home size={16} />} />
                         </Field>
                     </div>
 
                     <Field label="نبذة مختصرة (تظهر في الواجهة)">
                         <TextareaField
+                            name="bio"
                             rows={2}
-                            defaultValue="نعمل من أجل بناء مستقبل أفضل لدائرتنا، مستندين إلى الشفافية والمسؤولية المجتمعية."
-                            charCount="112 / 150 حرف"
+                            value={formData.bio}
+                            onChange={handleChange}
+                            charCount={`${formData.bio.length} / 150 حرف`}
                         />
                     </Field>
 
@@ -108,13 +287,10 @@ export default function HeroManagementDashboardPage() {
                         </p>
                         <div className="grid md:grid-cols-2 gap-5">
                             <Field label="الجزء الأول (النشأة والتعليم)">
-                                <TextareaField rows={3} defaultValue="ولدت ونشأت في قلب دائرتي الانتخابية..." />
+                                <TextareaField name="aboutPart1" rows={3} value={formData.aboutPart1} onChange={handleChange} />
                             </Field>
                             <Field label="الجزء الثاني (الرؤية والعمل النيابي)">
-                                <TextareaField
-                                    rows={3}
-                                    defaultValue="أؤمن بأن العمل البرلماني الحقيقي يبدأ من الاستماع للمواطن..."
-                                />
+                                <TextareaField name="aboutPart2" rows={3} value={formData.aboutPart2} onChange={handleChange} />
                             </Field>
                         </div>
                     </div>
@@ -124,61 +300,61 @@ export default function HeroManagementDashboardPage() {
                 <SectionCard icon={<Landmark size={18} />} title="البيانات الرسمية والمقرات">
                     <div className="grid md:grid-cols-2 gap-5">
                         <Field label="الدائرة الانتخابية">
-                            <InputWithIcon defaultValue="الدائرة الأولى - محافظة الجيزة" />
+                            <InputWithIcon name="circle" value={formData.circle} onChange={handleChange} />
                         </Field>
-                        <Field label="تاريخ بدء الدورة البرلمانية">
-                            <InputWithIcon type="date" defaultValue="2021-10-01" />
+                        <Field label="مواعيد واستقبال المواطنين (Work Appointment)">
+                            <InputWithIcon name="appointment" value={formData.appointment} onChange={handleChange} icon={<Clock size={16} />} />
                         </Field>
                     </div>
 
-                    {/* الحقل الجديد: مواعيد العمل لاستقبال المواطنين */}
-                    <Field label="مواعيد واستقبال المواطنين (Work Appointment)">
-                        <InputWithIcon
-                            defaultValue="الأحد والأربعاء من الساعة 5 مساءً حتى 9 مساءً"
-                            icon={<Clock size={16} />}
-                        />
-                    </Field>
-
                     <Field label="عنوان المقر الرئيسي لخدمة المواطنين">
-                        <InputWithIcon defaultValue="شارع الهرم الرئيسي، بجوار مبنى المحافظة القديم، الجيزة" />
+                        <InputWithIcon name="officeLocation" value={formData.officeLocation} onChange={handleChange} />
                     </Field>
 
                     <Field label="رابط خرائط جوجل (Google Maps Link)">
                         <InputWithIcon
-                            defaultValue="https://maps.google.com/..."
+                            name="locationURL"
+                            value={formData.locationURL}
+                            onChange={handleChange}
                             icon={<MapPin size={16} />}
                         />
                     </Field>
 
-                    <div className="rounded-service-container overflow-hidden border border-outline-variant h-52 bg-surface-container-high flex items-center justify-center text-on-surface-variant text-body-small">
-                        معاينة الخريطة
-                    </div>
+                    
                 </SectionCard>
 
                 {/* Contact channels */}
                 <SectionCard icon={<Share2 size={18} />} title="قنوات التواصل والشبكات الاجتماعية">
                     <div className="grid md:grid-cols-2 gap-5">
                         <Field label="رقم الهاتف الأساسي">
-                            <InputWithIcon defaultValue="01012345678" icon={<Phone size={16} />} />
+                            <InputWithIcon name="primaryPhone" value={formData.primaryPhone} onChange={handleChange} icon={<Phone size={16} />} />
                         </Field>
-                        <Field label="رقم الواتساب (للشكاوى)">
-                            <InputWithIcon defaultValue="01112345678" icon={<MessageCircle size={16} />} />
+                        <Field label="رقم الهاتف الثانوي">
+                            <InputWithIcon name="secondaryPhone" value={formData.secondaryPhone} onChange={handleChange} icon={<Phone size={16} />} />
                         </Field>
                     </div>
-                    <Field label="رابط صفحة الفيسبوك الرسمية">
-                        <InputWithIcon
-                            defaultValue="https://facebook.com/HanyShehataMP"
-                            icon={<LinkIcon size={16} />}
-                        />
-                    </Field>
+                    <div className="grid md:grid-cols-2 gap-5">
+                        <Field label="رقم الواتساب (للشكاوى)">
+                            <InputWithIcon name="whatsApp" value={formData.whatsApp} onChange={handleChange} icon={<MessageCircle size={16} />} />
+                        </Field>
+                        <Field label="رابط صفحة الفيسبوك الرسمية">
+                            <InputWithIcon
+                                name="facebookLing"
+                                value={formData.facebookLing}
+                                onChange={handleChange}
+                                icon={<LinkIcon size={16} />}
+                            />
+                        </Field>
+                    </div>
                 </SectionCard>
             </div>
 
             <SaveBar
                 helperText="تأكد من مراجعة البيانات قبل الحفظ لتحديث الموقع فوراً."
                 onSave={handleSave}
-                onDiscard={() => { }}
+                onDiscard={handleDiscard}
                 saving={saving}
+                disabled={!isDirty}
             />
         </>
     );
