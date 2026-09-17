@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { StatusBadge } from "@/components/employee-dashboard/complaints-management-page/Statusbadge";
 import { ComplaintRow, ComplaintPriority, RequestStatus } from "@/types/deputy.types";
-import ConfirmDialog from "@/components/ui/Confirmdialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 type DeputyComplaintDetailModalProps = {
     complaint: ComplaintRow | null;

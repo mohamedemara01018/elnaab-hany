@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
-import { AlertTriangle, HelpCircle, X } from "lucide-react";
+import React, { useEffect, type ReactNode } from "react";
+import { AlertTriangle, HelpCircle, Loader2, X } from "lucide-react";
 
-type ConfirmDialogProps = {
+export type ConfirmDialogProps = {
     open: boolean;
     title: string;
     description?: ReactNode;
@@ -28,14 +28,18 @@ export default function ConfirmDialog({
 }: ConfirmDialogProps) {
     const isDanger = variant === "danger";
 
-    // Close on Escape
+    // Handle Escape key navigation
     useEffect(() => {
         if (!open) return;
-        const handleKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape" && !loading) onClose();
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && !loading) {
+                onClose();
+            }
         };
-        document.addEventListener("keydown", handleKey);
-        return () => document.removeEventListener("keydown", handleKey);
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
     }, [open, loading, onClose]);
 
     if (!open) return null;
@@ -43,37 +47,35 @@ export default function ConfirmDialog({
     return (
         <div
             dir="rtl"
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="confirm-dialog-title"
+            aria-describedby={description ? "confirm-dialog-description" : undefined}
         >
             {/* Backdrop */}
-            <button
-                type="button"
-                aria-label="إغلاق"
+            <div
+                aria-hidden="true"
                 onClick={() => !loading && onClose()}
-                className="absolute inset-0 bg-slate-dark/50 backdrop-blur-[2px]"
+                className="fixed inset-0 bg-slate-dark/50 backdrop-blur-[2px] transition-opacity"
             />
 
-            {/* Dialog */}
-            <div className="relative w-full max-w-sm rounded-card bg-surface-container-lowest border border-outline-variant shadow-level-2">
+            {/* Dialog Container */}
+            <div className="relative w-full max-w-sm rounded-card bg-surface-container-lowest border border-outline-variant shadow-level-2 z-10 my-auto">
+                {/* Header */}
                 <div className="flex items-start justify-between gap-4 px-6 pt-6 pb-2">
                     <div className="flex items-start gap-3">
                         <span
-                            className={[
-                                "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
-                                isDanger
+                            className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${isDanger
                                     ? "bg-error-container text-error"
-                                    : "bg-secondary-container text-secondary",
-                            ].join(" ")}
+                                    : "bg-secondary-container text-secondary"
+                                }`}
                         >
                             {isDanger ? <AlertTriangle size={17} /> : <HelpCircle size={17} />}
                         </span>
                         <h2
                             id="confirm-dialog-title"
-                            className="text-title-card text-on-surface pt-1"
-                            style={{ fontSize: 18 }}
+                            className="text-title-card text-on-surface pt-1 text-lg font-bold"
                         >
                             {title}
                         </h2>
@@ -83,24 +85,28 @@ export default function ConfirmDialog({
                         onClick={onClose}
                         disabled={loading}
                         aria-label="إغلاق"
-                        className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50"
+                        className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50 cursor-pointer"
                     >
                         <X size={16} />
                     </button>
                 </div>
 
+                {/* Body / Description */}
                 {description && (
-                    <div className="px-6 pb-5 ps-[3.75rem]">
-                        <p className="text-body-main text-on-surface-variant">{description}</p>
+                    <div id="confirm-dialog-description" className="px-6 pb-5 ps-[3.75rem]">
+                        <p className="text-body-main text-on-surface-variant leading-relaxed">
+                            {description}
+                        </p>
                     </div>
                 )}
 
+                {/* Action Footer */}
                 <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant bg-surface-container-low rounded-b-card">
                     <button
                         type="button"
                         onClick={onClose}
                         disabled={loading}
-                        className="btn-outline px-5 py-2.5 text-body-main disabled:opacity-50"
+                        className="btn-outline px-5 py-2.5 text-body-main disabled:opacity-50 cursor-pointer"
                     >
                         {cancelLabel}
                     </button>
@@ -108,12 +114,13 @@ export default function ConfirmDialog({
                         type="button"
                         onClick={onConfirm}
                         disabled={loading}
-                        className={[
-                            "px-5 py-2.5 text-body-main font-semibold rounded-interactive transition-colors disabled:opacity-60",
-                            isDanger ? "bg-error text-on-error hover:opacity-90" : "btn-primary",
-                        ].join(" ")}
+                        className={`flex items-center gap-2 px-5 py-2.5 text-body-main font-semibold rounded-interactive transition-colors disabled:opacity-60 cursor-pointer ${isDanger
+                                ? "bg-error text-on-error hover:opacity-90"
+                                : "btn-primary"
+                            }`}
                     >
-                        {loading ? "جارِ التنفيذ..." : confirmLabel}
+                        {loading && <Loader2 size={16} className="animate-spin" />}
+                        <span>{loading ? "جارِ التنفيذ..." : confirmLabel}</span>
                     </button>
                 </div>
             </div>

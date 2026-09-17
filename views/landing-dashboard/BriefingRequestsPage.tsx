@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/Pageheader";
-import ConfirmDialog from "@/components/ui/Confirmdialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { BriefingRequestModal } from "@/modals/BriefingRequestModal";
 import { BriefingRequestItem, BriefingRequestItemRow } from "@/components/landing-dashboard/briefing-requests-dashboard-page/BriefingRequestItemRow";
 import { briefingRequestsService } from "@/services/briefing-requests.service";

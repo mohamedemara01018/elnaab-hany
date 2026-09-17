@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/Pageheader";
-import ConfirmDialog from "@/components/ui/Confirmdialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { VideoModal as VideoFormModal } from "@/modals/VideoModal";
 import VideoPreviewModal from "@/components/ui/VideoModal";
 import { VideoItem, VideoItemRow } from "@/components/landing-dashboard/video-management-dashboard-page/VideoItemRow";

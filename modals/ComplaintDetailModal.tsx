@@ -5,7 +5,7 @@ import { X, Calendar, Phone, User, ExternalLink, AlertCircle, Loader2, Trash2, M
 import { StatusBadge, ComplaintStatus } from "@/components/employee-dashboard/complaints-management-page/Statusbadge";
 import { ComplaintPriority, RequestStatus } from "@/utils/enums.utils";
 import { CommentInfo } from "@/types/employee.types";
-import ConfirmDialog from "@/components/ui/Confirmdialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 
 export type ComplaintRow = {
     id: string;

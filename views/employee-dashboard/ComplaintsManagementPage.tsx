@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, SetStateAction } from "react";
 import { CheckCircle2, Hourglass, FileText, Bell, Search, Plus } from "lucide-react";
 
 import { PageHeader } from "@/components/ui/Pageheader";
-import { StatCard } from "@/components/employee-dashboard/complaints-management-page/Statcard";
 import { ComplaintsTable } from "@/components/employee-dashboard/complaints-management-page/ComplaintsTable";
 import { employeeService } from "@/services/employee.service";
 import { complaintService } from "@/services/complaint.service";
@@ -20,6 +19,7 @@ import {
     EmployeeStatisticsResponse,
     CommentInfo,
 } from "@/types/employee.types";
+import StatCard from "@/components/ui/Statcard";
 
 const PAGE_SIZE = 10;
 

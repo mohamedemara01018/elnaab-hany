@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/Pageheader";
-import ConfirmDialog from "@/components/ui/Confirmdialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { AchievementModal } from "@/modals/AchievementModal";
 import { AchievementItem, AchievementItemRow } from "@/components/landing-dashboard/achievements-management-dashboard-page/AchievementItemRow";
 import { achievementService } from "@/services/achievement.service";

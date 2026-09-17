@@ -1,3 +1,4 @@
+'use client";'
 import type { ReactNode } from "react";
 
 type StatCardProps = {
@@ -14,7 +15,7 @@ const TONE_STYLES: Record<NonNullable<StatCardProps["tone"]>, string> = {
     neutral: "bg-surface-container-high text-on-surface-variant",
 };
 
-export function StatCard({ label, value, icon, tone = "neutral" }: StatCardProps) {
+export default function StatCard({ label, value, icon, tone = "neutral" }: StatCardProps) {
     return (
         <div className="card flex items-center justify-between !p-5">
             <div>

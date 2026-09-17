@@ -6,7 +6,7 @@ import { ActivityItem, ActivityItemRow } from "@/components/landing-dashboard/ac
 import { PageHeader } from "@/components/ui/Pageheader";
 import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
 import { ActivityModal } from "@/modals/Activitymodal";
-import ConfirmDialog from "@/components/ui/Confirmdialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { activitiesService } from "@/services/activities.service";
 import { Activity } from "@/types/activities.types";
 import ImageModal from "@/components/ui/ImageModal";

@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { Plus, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/ui/Pageheader";
-import ConfirmDialog from "@/components/ui/Confirmdialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { TeamModal } from "@/modals/TeamModal";
 import { TeamItemRow } from "@/components/landing-dashboard/team-management-dashboard-page/TeamItemRow";
 import { employeeService } from "@/services/employee.service";

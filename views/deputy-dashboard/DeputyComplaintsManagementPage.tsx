@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback, SetStateAction } from "react";
 import { CheckCircle2, Hourglass, FileText, Bell, Search, Plus, SlidersHorizontal } from "lucide-react";
 
 import { PageHeader } from "@/components/ui/Pageheader";
-import { StatCard } from "@/components/employee-dashboard/complaints-management-page/Statcard";
 import { deputyService } from "@/services/deputy.service";
 import { complaintService } from "@/services/complaint.service";
 import { DeputyComplaintDetailModal } from "@/modals/DeputyComplaintDetailModal";
@@ -27,6 +26,7 @@ import {
     RequestStatus,
 } from "@/types/deputy.types";
 import { DeputyComplaintsTable } from "@/components/deputy-dashboard/deputy-complaints-management-page/DeputyComplaintsTable";
+import StatCard from "@/components/ui/Statcard";
 
 const PAGE_SIZE = 10;
 const SEARCH_DEBOUNCE_MS = 400;

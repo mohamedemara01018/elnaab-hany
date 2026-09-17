@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Loader2 } from "lucide-react";
-import ConfirmDialog from "@/components/ui/Confirmdialog";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { PageHeader } from "@/components/ui/Pageheader";
 import { EventModal } from "@/modals/EventModal";
 import { EventItem, EventItemRow } from "@/components/landing-dashboard/event-management-dashboard-page/EventsItemRow";

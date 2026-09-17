@@ -38,9 +38,6 @@ export function Navbar() {
   const linkTapAnimation = { scale: 0.95 };
 
   const fullName = heroInfo?.fullName || "النائب هاني شحاتة";
-  const nameParts = fullName.split(" ");
-  const firstName = nameParts[0] || "";
-  const lastName = nameParts.slice(1).join(" ") || "";
   const avatarUrl = getMediaUrl(heroInfo?.mediaUrl) || "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg";
 
   return (
@@ -54,8 +51,7 @@ export function Navbar() {
         <a href="#home" aria-label="الصفحة الرئيسية" className="flex gap-4 items-center justify-center">
           <UserImage
             avatarUrl={avatarUrl}
-            firstName={firstName}
-            lastName={lastName}
+            fullName={fullName}
             className="w-10 h-10"
           />
           <div className="flex flex-col">
