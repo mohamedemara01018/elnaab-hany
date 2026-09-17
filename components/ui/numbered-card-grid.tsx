@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Image, { StaticImageData } from "next/image";
 import { fadeUp, staggerContainer, revealViewport } from "@/lib/motion-variants";
-import defaultImg from "@/public/721082606_122225076506346497_7612991756831435743_n.jpg";
+import defaultImg from "@/public/help_people.jpg";
 
 export interface CardItem {
   id?: number | string;

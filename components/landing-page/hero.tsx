@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import { staggerContainer, fadeUp, scaleIn } from "@/lib/motion-variants";
-import imgFallback from "@/public/702718504_122221557020346497_6976720022155079154_n.jpg";
+import imgFallback from "@/public/hanyImage.jpg";
 import { HeroInfoData, GetHeroInfoResponse } from "@/types/hero.types";
 
 interface HeroProps {

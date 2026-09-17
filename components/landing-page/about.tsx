@@ -6,7 +6,7 @@ import { Section } from "@/components/ui/section";
 import { SectionTitle } from "@/components/ui/section-title";
 import { FACTS } from "@/lib/data";
 import { fadeUp, scaleIn, staggerContainer, revealViewport } from "@/lib/motion-variants";
-import imgFallback from "@/public/721082606_122225076506346497_7612991756831435743_n.jpg";
+import imgFallback from "@/public/help_people.jpg";
 import { HeroInfoData, GetHeroInfoResponse } from "@/types/hero.types";
 
 interface AboutProps {
@@ -21,15 +21,14 @@ export function About({ data }: AboutProps) {
   const name = heroInfo?.fullName ? `النائب ${heroInfo.fullName}` : "النائب هاني شحاتة";
   const aboutPart1 = heroInfo?.aboutPart1;
   const aboutPart2 = heroInfo?.aboutPart2;
-  const imageSrc = heroInfo?.mediaUrl || imgFallback;
 
   const facts = heroInfo
     ? [
-        { icon: "📅", label: "تاريخ الميلاد", value: heroInfo.birthOfDate || "19 يونيو 1983" },
-        { icon: "📍", label: "محل الإقامة", value: heroInfo.address || "مدينة بنها - القليوبية" },
-        { icon: "⏰", label: "مواعيد التواصل", value: heroInfo.appointment || "1 ظهراً - 10 مساءً" },
-        { icon: "🏛️", label: "الدائرة", value: heroInfo.circle || "بنها وكفر شكر" },
-      ]
+      { icon: "📅", label: "تاريخ الميلاد", value: heroInfo.birthOfDate || "19 يونيو 1983" },
+      { icon: "📍", label: "محل الإقامة", value: heroInfo.address || "مدينة بنها - القليوبية" },
+      { icon: "⏰", label: "مواعيد التواصل", value: heroInfo.appointment || "1 ظهراً - 10 مساءً" },
+      { icon: "🏛️", label: "الدائرة", value: heroInfo.circle || "بنها وكفر شكر" },
+    ]
     : FACTS;
 
   return (
@@ -45,15 +44,14 @@ export function About({ data }: AboutProps) {
       >
         <motion.div
           variants={scaleIn}
-          className="service-container relative overflow-hidden aspect-square md:aspect-auto h-full min-h-[320px] rounded-2xl"
+          className="service-container relative overflow-hidden aspect-square md:aspect-auto h-full min-h-80 rounded-2xl"
           style={{ boxShadow: "var(--shadow-level-2)" }}
         >
           <Image
-            src={imageSrc}
+            src={imgFallback}
             alt={`${name} - جولة ميدانية لخدمة المواطنين`}
             fill
             className="object-cover"
-            unoptimized={typeof imageSrc === "string"}
           />
           <div className="absolute bottom-4 left-4 bg-primary text-on-primary px-4 py-2.5 rounded-md font-display text-sm font-bold z-10">
             خدمة

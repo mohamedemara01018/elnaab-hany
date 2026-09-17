@@ -26,6 +26,8 @@ const amiri = Amiri({
   display: "swap",
 });
 
+const imagePath = "/hanyImage.jpg?v=2"
+
 export const metadata: Metadata = {
   title: "النائب هاني شحاتة | الموقع الرسمي - عضو مجلس النواب عن دائرة بنها وكفر شكر",
   description:
@@ -43,7 +45,9 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "مكتب النائب هاني شحاتة" }],
   icons: {
-    icon: "/icon.png",
+    icon: imagePath,
+    shortcut: imagePath,
+    apple: imagePath,
   },
   openGraph: {
     title: "النائب هاني شحاتة | الموقع الرسمي",
@@ -53,9 +57,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
+        url: imagePath,
         alt: "النائب هاني شحاتة",
       },
     ],
@@ -65,7 +67,7 @@ export const metadata: Metadata = {
     title: "النائب هاني شحاتة | الموقع الرسمي",
     description:
       "تواصل مع مكتب النائب هاني شحاتة، وقدّم شكواك أو مقترحك مباشرة.",
-    images: ["/og-image.png"],
+    images: [imagePath],
   },
   robots: {
     index: true,
