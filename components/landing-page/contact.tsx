@@ -1,8 +1,14 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Section } from "@/components/ui/section";
 import { SectionTitle } from "@/components/ui/section-title";
-import { CONTACT_CARDS, TEAM } from "@/lib/data";
+import UserImage from "@/components/ui/UserImage";
+import { CONTACT_CARDS, TEAM as FALLBACK_TEAM } from "@/lib/data";
 import { HeroInfoData, GetHeroInfoResponse } from "@/types/hero.types";
+import { EmployeeItem } from "@/types/employee.types";
+import { employeeService } from "@/services/employee.service";
 import { fadeUp, staggerContainer, revealViewport } from "@/lib/motion-variants";
 
 interface ContactProps {
@@ -10,6 +16,27 @@ interface ContactProps {
 }
 
 export function Contact({ data }: ContactProps) {
+  const [employees, setEmployees] = useState<EmployeeItem[]>([]);
+  const [loadingEmployees, setLoadingEmployees] = useState(true);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        setLoadingEmployees(true);
+        const response = await employeeService.getAllEmployees();
+        if (response?.isSuccess && Array.isArray(response.value)) {
+          setEmployees(response.value);
+        }
+      } catch (error) {
+        console.error("Failed to load employees for contact team section:", error);
+      } finally {
+        setLoadingEmployees(false);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
   const heroInfo: HeroInfoData | null =
     data && "value" in data ? (data.value as HeroInfoData) : (data as HeroInfoData | null);
 
@@ -65,6 +92,20 @@ export function Contact({ data }: ContactProps) {
     ]
     : CONTACT_CARDS;
 
+  const displayTeam: EmployeeItem[] =
+    employees.length > 0
+      ? employees
+      : FALLBACK_TEAM.map((t, idx) => ({
+        id: String(idx),
+        fullName: t.name,
+        email: "",
+        about: t.role,
+        phone: t.phone,
+        imageUrl: null,
+        departmentName: "مكتب الخدمات",
+        organizations: [],
+      }));
+
   return (
     <Section id="contact">
       <SectionTitle
@@ -74,6 +115,7 @@ export function Contact({ data }: ContactProps) {
         blurb="تواصل مباشرة مع مكتب النائب أو مع أحد أعضاء فريق الخدمات."
       />
 
+      {/* Main Contact Cards */}
       <motion.div
         variants={staggerContainer(0.1)}
         initial="hidden"
@@ -110,6 +152,7 @@ export function Contact({ data }: ContactProps) {
         ))}
       </motion.div>
 
+      {/* Team Header */}
       <motion.div
         variants={fadeUp}
         initial="hidden"
@@ -126,6 +169,7 @@ export function Contact({ data }: ContactProps) {
         </p>
       </motion.div>
 
+      {/* Team Cards List */}
       <motion.div
         variants={staggerContainer(0.08)}
         initial="hidden"
@@ -133,42 +177,86 @@ export function Contact({ data }: ContactProps) {
         viewport={revealViewport}
         className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
       >
-        {TEAM.map((t) => (
-          <motion.article
-            key={t.n}
-            variants={fadeUp}
-            whileHover={{ y: -6 }}
-            transition={{ duration: 0.3 }}
-            className={`card flex flex-col justify-between p-6 rounded-2xl border transition-all duration-300 ${t.office
-                ? "bg-primary text-on-primary border-primary shadow-lg"
-                : "bg-surface-container-lowest border-outline-variant/30 hover:border-primary/40 text-on-surface shadow-sm hover:shadow-xl"
-              }`}
-          >
-            <div className="flex flex-col gap-2">
-              <span
-                className={`font-display font-black text-xs px-2.5 py-0.5 rounded-lg w-fit ${t.office ? "bg-white/20 text-white" : "bg-primary/10 text-primary"
-                  }`}
-              >
-                {t.n}
-              </span>
-              <h3 className="font-display text-lg font-bold mt-1">{t.name}</h3>
-              <p className={`text-sm leading-relaxed ${t.office ? "text-white/90" : "text-on-surface-variant"}`}>
-                {t.role}
-              </p>
-            </div>
+        {loadingEmployees
+          ? Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="animate-pulse bg-surface-container-low h-56 rounded-2xl border border-outline-variant/30 p-6" />
+          ))
+          : displayTeam.map((emp) => (
+            <motion.article
+              key={emp.id}
+              variants={fadeUp}
+              whileHover={{ y: -6 }}
+              transition={{ duration: 0.3 }}
+              className="card flex flex-col justify-between p-6 rounded-2xl border transition-all duration-300 bg-surface-container-lowest border-outline-variant/30 hover:border-primary/40 text-on-surface shadow-sm hover:shadow-xl"
+            >
+              <div className="flex flex-col gap-3">
+                {/* Avatar, Name, and Department */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <UserImage
+                      fullName={emp.fullName}
+                      avatarUrl={emp.imageUrl}
+                      className="w-12 h-12 text-base font-bold border border-outline-variant/20 shrink-0"
+                    />
+                    <div>
+                      <h3 className="font-display text-lg font-bold text-on-surface leading-snug">
+                        {emp.fullName}
+                      </h3>
+                      {emp.departmentName && (
+                        <span className="inline-block mt-0.5 text-xs font-semibold px-2 py-0.5 rounded-md bg-primary/10 text-primary">
+                          {emp.departmentName}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-            <div className="mt-4 pt-3.5 border-t border-current/15 flex items-center justify-between">
-              <a
-                href={`tel:${t.phone}`}
-                className={`font-bold text-sm inline-flex items-center gap-1.5 hover:underline ${t.office ? "text-white" : "text-primary"
-                  }`}
-              >
-                ☎ {t.phone}
-              </a>
-              {t.office && <span className="text-xs bg-white/25 px-2.5 py-1 rounded-md">المكتب الرئيسي</span>}
-            </div>
-          </motion.article>
-        ))}
+                {/* About Details */}
+                {emp.about && (
+                  <p className="text-sm leading-relaxed text-on-surface-variant line-clamp-3">
+                    {emp.about}
+                  </p>
+                )}
+
+                {/* Organizations Badges */}
+                {emp.organizations && emp.organizations.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {emp.organizations.map((org, index) => (
+                      <span
+                        key={index}
+                        className="text-[11px] px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-medium"
+                      >
+                        {org}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer Contact Details */}
+              <div className="mt-5 pt-3.5 border-t border-outline-variant/30 flex flex-col gap-1.5">
+                {emp.phone && (
+                  <a
+                    href={`tel:${emp.phone}`}
+                    className="font-bold text-sm inline-flex items-center gap-1.5 text-primary hover:underline"
+                  >
+                    <span>☎</span>
+                    <span dir="ltr">{emp.phone}</span>
+                  </a>
+                )}
+
+                {emp.email && (
+                  <a
+                    href={`mailto:${emp.email}`}
+                    className="text-xs text-on-surface-variant hover:text-primary transition-colors truncate"
+                    title={emp.email}
+                  >
+                    ✉ {emp.email}
+                  </a>
+                )}
+              </div>
+            </motion.article>
+          ))}
       </motion.div>
     </Section>
   );

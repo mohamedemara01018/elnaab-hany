@@ -10,13 +10,18 @@ import {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+const getAuthHeaders = (): Record<string, string> => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    return {
+        accept: "*/*",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+};
+
 export const achievementService = {
     getAll: async (): Promise<GetAchievementsResponse> => {
         const response = await fetch(`${BASE_URL}/api/achievements`, {
             method: "GET",
-            headers: {
-                "accept": "*/*",
-            },
         });
 
         const data = await response.json().catch(() => null);
@@ -31,9 +36,6 @@ export const achievementService = {
     getById: async (achievementId: number): Promise<GetAchievementByIdResponse> => {
         const response = await fetch(`${BASE_URL}/api/achievements/${achievementId}`, {
             method: "GET",
-            headers: {
-                "accept": "*/*",
-            },
         });
 
         const data = await response.json().catch(() => null);
@@ -55,9 +57,7 @@ export const achievementService = {
 
         const response = await fetch(`${BASE_URL}/api/achievements`, {
             method: "POST",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -80,9 +80,7 @@ export const achievementService = {
 
         const response = await fetch(`${BASE_URL}/api/achievements/${achievementId}`, {
             method: "PUT",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -98,9 +96,7 @@ export const achievementService = {
     delete: async (achievementId: number): Promise<DeleteAchievementResponse> => {
         const response = await fetch(`${BASE_URL}/api/achievements/${achievementId}`, {
             method: "DELETE",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
         });
 
         const data = await response.json().catch(() => null);

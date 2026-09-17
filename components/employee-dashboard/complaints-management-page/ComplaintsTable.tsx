@@ -1,3 +1,6 @@
+"use client";
+
+import React from "react";
 import { Eye } from "lucide-react";
 import { ComplaintStatus, StatusBadge } from "./Statusbadge";
 
@@ -7,10 +10,15 @@ export type ComplaintRow = {
     phone: string;
     nationalId: string;
     requestType: string;
-    jurisdiction: string;
+    jurisdiction?: string;
+    departmentName?: string;
+    organizationName?: string;
     date: string;
     employee: string;
     status: ComplaintStatus;
+    title?: string;
+    description?: string;
+    mediaUrl?: string;
 };
 
 const COLUMNS = [
@@ -18,19 +26,20 @@ const COLUMNS = [
     "الهاتف",
     "الرقم القومي",
     "نوع الطلب",
-    "الجهة",
+    "الجهة / المنظمة",
+    "القسم / الإدارة",
     "التاريخ",
-    "الموظف",
     "الحالة",
     "الإجراء",
 ];
 
 type ComplaintsTableProps = {
     rows: ComplaintRow[];
+    loading?: boolean;
     onView?: (row: ComplaintRow) => void;
 };
 
-export function ComplaintsTable({ rows, onView }: ComplaintsTableProps) {
+export function ComplaintsTable({ rows, loading, onView }: ComplaintsTableProps) {
     return (
         <div className="rounded-card border border-outline-variant overflow-hidden">
             <div className="overflow-x-auto">
@@ -48,7 +57,13 @@ export function ComplaintsTable({ rows, onView }: ComplaintsTableProps) {
                         </tr>
                     </thead>
                     <tbody>
-                        {rows.length === 0 ? (
+                        {loading ? (
+                            <tr>
+                                <td colSpan={COLUMNS.length} className="py-14 text-center text-body-main text-on-surface-variant">
+                                    جاري تحميل البيانات...
+                                </td>
+                            </tr>
+                        ) : rows.length === 0 ? (
                             <tr>
                                 <td colSpan={COLUMNS.length} className="py-14 text-center text-body-main text-on-surface-variant">
                                     لا توجد شكاوى
@@ -70,13 +85,13 @@ export function ComplaintsTable({ rows, onView }: ComplaintsTableProps) {
                                         {row.requestType}
                                     </td>
                                     <td className="px-4 py-3 text-body-small text-on-surface-variant whitespace-nowrap">
-                                        {row.jurisdiction}
+                                        {row.organizationName || "-"}
+                                    </td>
+                                    <td className="px-4 py-3 text-body-small text-on-surface-variant whitespace-nowrap">
+                                        {row.departmentName || "-"}
                                     </td>
                                     <td className="px-4 py-3 text-body-small text-on-surface-variant whitespace-nowrap">
                                         {row.date}
-                                    </td>
-                                    <td className="px-4 py-3 text-body-small text-on-surface-variant whitespace-nowrap">
-                                        {row.employee}
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap">
                                         <StatusBadge status={row.status} />

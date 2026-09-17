@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { X, Upload, CheckCircle2 } from "lucide-react";
-import { Field, InputWithIcon } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
+import { Field, InputWithIcon } from "@/components/ui/Formfield";
 import { VideoItem } from "@/components/landing-dashboard/video-management-dashboard-page/VideoItemRow";
 
 type ModalProps = {

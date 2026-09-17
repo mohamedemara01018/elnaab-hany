@@ -1,30 +1,39 @@
-
 'use client';
 
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { DashboardLayout } from '@/components/layout/dashboard/DashboardLayout';
 import HeroManagementDashboardPage from './landing-dashboard/HeroManagementDashboardPage';
 import LandingPage from './LandingPage';
-import { NAV_ITEMS_EMPLOYEE_DASH, NAV_ITEMS_MAHER_DASH } from '@/utils/constant.utils';
 import ComplaintsManagementPage from './employee-dashboard/ComplaintsManagementPage';
-
-enum RoleType {
-    ADMIN = 'admin',
-    DEPUTY = 'deputy',
-    LANDING_DASH = 'landing_dash',
-    LANDING = 'landing',
-    EMPLOYEE = 'employee',
-}
+import { NAV_ITEMS_DEPUTY, NAV_ITEMS_EMPLOYEE_DASH, NAV_ITEMS_MAHER_DASH } from '@/utils/constant.utils';
+import { UserRole } from '@/utils/enums.utils';
+import { AppDispatch } from '@/store/store';
+import { fetchMe, selectMeSlice } from '@/store/slices/auth/meSlice';
+import Loading from '@/components/ui/Loading';
+import DeputyComplaintsManagementPage from './deputy-dashboard/DeputyComplaintsManagementPage';
 
 export default function HomePage() {
+    const dispatch = useDispatch<AppDispatch>();
+    const { me, isLoading, initialized } = useSelector(selectMeSlice);
 
-    // أو الإبقاء على const مع توضيح النوع المباشر
-    const currentRole: RoleType = RoleType.LANDING as RoleType;
+    useEffect(() => {
+        if (!initialized && !isLoading) {
+            dispatch(fetchMe());
+        }
+    }, [dispatch, initialized, isLoading]);
 
-    switch (currentRole) {
-        case RoleType.LANDING_DASH:
+    if (isLoading || !initialized) {
+        return <Loading />; // Render loading spinner if preferred
+    }
+
+    const userName = me?.name || 'مستخدم';
+    console.log(me)
+    switch (me?.role) {
+        case UserRole.SOCIAL:
             return (
                 <DashboardLayout
-                    userName="أدمن هاني شحاتة"
+                    userName={userName}
                     userRole="المسؤول"
                     NAV_ITEMS={NAV_ITEMS_MAHER_DASH}
                 >
@@ -32,27 +41,28 @@ export default function HomePage() {
                 </DashboardLayout>
             );
 
-        case RoleType.DEPUTY:
+        case UserRole.ADMIN:
             return (
                 <DashboardLayout
-                    userName="أدمن هاني شحاتة"
-                    userRole="المسؤول"
-                    NAV_ITEMS={[]}
+                    userName={userName}
+                    userRole="نائب"
+                    NAV_ITEMS={NAV_ITEMS_DEPUTY}
                 >
-                    <div>deputy</div>
+                    <DeputyComplaintsManagementPage />
                 </DashboardLayout>
             );
 
-        case RoleType.EMPLOYEE:
+        case UserRole.EMPLOYEE:
             return (
                 <DashboardLayout
-                    userName="أدمن هاني شحاتة"
-                    userRole="المسؤول"
+                    userName={userName}
+                    userRole="موظف"
                     NAV_ITEMS={NAV_ITEMS_EMPLOYEE_DASH}
                 >
                     <ComplaintsManagementPage />
                 </DashboardLayout>
             );
+
         default:
             return <LandingPage />;
     }

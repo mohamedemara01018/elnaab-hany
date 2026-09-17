@@ -10,13 +10,18 @@ import {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+const getAuthHeaders = (): Record<string, string> => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    return {
+        accept: "*/*",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+};
+
 export const activityVisitService = {
     getAll: async (): Promise<GetActivitiesVisitsResponse> => {
         const response = await fetch(`${BASE_URL}/api/activities-visits`, {
             method: "GET",
-            headers: {
-                "accept": "*/*",
-            },
         });
 
         const data = await response.json().catch(() => null);
@@ -31,9 +36,6 @@ export const activityVisitService = {
     getById: async (activityVisitId: number): Promise<GetActivityVisitByIdResponse> => {
         const response = await fetch(`${BASE_URL}/api/activities-visits/${activityVisitId}`, {
             method: "GET",
-            headers: {
-                "accept": "*/*",
-            },
         });
 
         const data = await response.json().catch(() => null);
@@ -55,9 +57,7 @@ export const activityVisitService = {
 
         const response = await fetch(`${BASE_URL}/api/activities-visits`, {
             method: "POST",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -83,9 +83,7 @@ export const activityVisitService = {
 
         const response = await fetch(`${BASE_URL}/api/activities-visits/${activityVisitId}`, {
             method: "PUT",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -101,9 +99,7 @@ export const activityVisitService = {
     delete: async (activityVisitId: number): Promise<DeleteActivityVisitResponse> => {
         const response = await fetch(`${BASE_URL}/api/activities-visits/${activityVisitId}`, {
             method: "DELETE",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
         });
 
         const data = await response.json().catch(() => null);

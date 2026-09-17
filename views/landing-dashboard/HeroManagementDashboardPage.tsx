@@ -3,8 +3,8 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { User, Landmark, Share2, MapPin, Phone, MessageCircle, Link as LinkIcon, Camera, Trash2, Calendar, Clock, Home, Loader2 } from "lucide-react";
-import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
-import { Field, InputWithIcon, SectionCard, TextareaField } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
+import { PageHeader } from "@/components/ui/Pageheader";
+import { Field, InputWithIcon, SectionCard, TextareaField } from "@/components/ui/Formfield";
 import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
 import { heroService } from "@/services/hero.service";
 import { UpdateHeroInfoPayload } from "@/types/hero.types";

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Loader2 } from "lucide-react";
-import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
+import { PageHeader } from "@/components/ui/Pageheader";
 import ConfirmDialog from "@/components/ui/Confirmdialog";
 import { VideoModal as VideoFormModal } from "@/modals/VideoModal";
 import VideoPreviewModal from "@/components/ui/VideoModal";

@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { X, Upload, Loader2 } from "lucide-react";
 import { BriefingRequestItem } from "@/components/landing-dashboard/briefing-requests-dashboard-page/BriefingRequestItemRow";
-import { Field, InputWithIcon, TextareaField } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
+import { Field, InputWithIcon, TextareaField } from "@/components/ui/Formfield";
 
 type ModalProps = {
     open: boolean;

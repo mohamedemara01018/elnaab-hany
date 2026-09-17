@@ -16,6 +16,26 @@ export interface LoginResponse {
     message: string;
 }
 
+export interface CreateEmployeePayload {
+    fullName: string;
+    email: string;
+    password: string;
+    phoneNumber?: string;
+    role: string;
+    departmentId: number;
+    organizationIds: number[]; // Updated to accept an array of numbers
+    about?: string;
+    image?: File | null;
+}
+
+export interface CreateEmployeeResponse {
+    isSuccess: boolean;
+    status: number;
+    error: string | null;
+    value: number | null;
+    message: string;
+}
+
 export interface ForgotPasswordPayload {
     email: string;
 }
@@ -55,7 +75,6 @@ export interface ResetPasswordResponse {
     value: string;
     message: string;
 }
-
 
 export interface ChangePasswordPayload {
     currentPassword: string;

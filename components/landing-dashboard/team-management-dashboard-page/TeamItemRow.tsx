@@ -1,37 +1,32 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Edit2, Trash2, Phone, Clock, User } from "lucide-react";
-
-export type TeamItem = {
-    id: string;
-    order: number;
-    name: string;
-    role: string;
-    phone: string;
-    imageUrl?: string;
-    availableHours?: string;
-};
+import { Edit2, Trash2, Phone, User, Mail, Building2, Briefcase } from "lucide-react";
+import { EmployeeItem } from "@/types/employee.types";
 
 type TeamItemRowProps = {
-    item: TeamItem;
-    onEdit: (item: TeamItem) => void;
+    item: EmployeeItem;
+    order: number;
+    onEdit: (item: EmployeeItem) => void;
     onRemove: (id: string) => void;
 };
 
-export function TeamItemRow({ item, onEdit, onRemove }: TeamItemRowProps) {
+export function TeamItemRow({ item, order, onEdit, onRemove }: TeamItemRowProps) {
+    const displayName = item.fullName || "بدون اسم";
+    const avatarSrc = item.imageUrl;
+
     return (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-outline-variant bg-surface hover:border-primary/50 transition-colors">
-            <div className="flex items-center gap-4 min-w-0">
+            <div className="flex items-start sm:items-center gap-4 min-w-0">
                 {/* Order Badge */}
                 <div className="w-10 h-10 rounded-lg bg-surface-container-high border border-outline-variant flex items-center justify-center shrink-0 font-bold text-primary text-body-small">
-                    {String(item.order).padStart(2, "0")}
+                    {String(order).padStart(2, "0")}
                 </div>
 
                 {/* Member Avatar */}
                 <div className="relative w-14 h-14 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant flex items-center justify-center shrink-0">
-                    {item.imageUrl ? (
-                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                    {avatarSrc ? (
+                        <img src={avatarSrc} alt={displayName} className="w-full h-full object-cover" />
                     ) : (
                         <div className="flex items-center justify-center text-on-surface-variant/40">
                             <User size={24} />
@@ -41,25 +36,50 @@ export function TeamItemRow({ item, onEdit, onRemove }: TeamItemRowProps) {
 
                 {/* Member Details */}
                 <div className="flex flex-col gap-1 min-w-0">
-                    <h3 className="text-body-main font-semibold text-on-surface truncate">
-                        {item.name || "بدون اسم"}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                        <h3 className="text-body-main font-semibold text-on-surface truncate">
+                            {displayName}
+                        </h3>
+                        {item.departmentName && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium bg-primary/10 text-primary rounded-full shrink-0">
+                                <Briefcase size={10} />
+                                {item.departmentName}
+                            </span>
+                        )}
+                    </div>
+
                     <p className="text-body-small text-on-surface-variant line-clamp-1">
-                        {item.role || "لا يوجد اختصاص"}
+                        {item.about || "لا يوجد اختصاص / نبذة"}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-4 mt-1 text-xs text-on-surface-variant">
+                    {/* Metadata Attributes */}
+                    <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-on-surface-variant">
+                        {item.email && (
+                            <span className="flex items-center gap-1 font-mono dir-ltr">
+                                <Mail size={12} className="text-primary" />
+                                {item.email}
+                            </span>
+                        )}
+
                         {item.phone && (
                             <span className="flex items-center gap-1 font-mono dir-ltr">
                                 <Phone size={12} className="text-primary" />
-                                {item.phone}
+                                <span>{item.phone}</span>
                             </span>
                         )}
-                        {item.availableHours && (
-                            <span className="flex items-center gap-1">
-                                <Clock size={12} className="text-primary" />
-                                {item.availableHours}
-                            </span>
+
+                        {item.organizations && item.organizations.length > 0 && (
+                            <div className="flex items-center gap-1 flex-wrap">
+                                <Building2 size={12} className="text-primary shrink-0" />
+                                {item.organizations.map((org, index) => (
+                                    <span
+                                        key={index}
+                                        className="bg-surface-container-high text-on-surface px-1.5 py-0.5 rounded text-[11px]"
+                                    >
+                                        {org}
+                                    </span>
+                                ))}
+                            </div>
                         )}
                     </div>
                 </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { ActivityItem, ActivityItemRow } from "@/components/landing-dashboard/activities-management-dashboard-page/Activityitemrow";
-import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
+import { PageHeader } from "@/components/ui/Pageheader";
 import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
 import { ActivityModal } from "@/modals/Activitymodal";
 import ConfirmDialog from "@/components/ui/Confirmdialog";

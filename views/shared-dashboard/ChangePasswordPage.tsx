@@ -3,8 +3,9 @@
 import { useState, forwardRef } from "react";
 import { useDispatch } from "react-redux";
 import { ShieldCheck, KeyRound, Eye, EyeOff, Check, X } from "lucide-react";
-import { PageHeader } from "@/components/landing-dashboard/hero-management-dashboard-page/Pageheader";
-import { Field, SectionCard } from "@/components/landing-dashboard/hero-management-dashboard-page/Formfield";
+import { PageHeader } from "@/components/ui/Pageheader";
+import { SectionCard } from "@/components/ui/Formfield";
+import { Field } from "@/components/ui/Field";
 import { authService } from "@/services/auth.service";
 import { toastify } from "@/store/slices/toastificationSlice";
 
@@ -67,8 +68,8 @@ const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
                         placeholder={placeholder}
                         autoComplete={autoComplete}
                         className={[
-                            "input-field w-full py-3 ps-4 pe-11 text-body-main text-on-surface",
-                            error ? "border border-error!" : "",
+                            "w-full bg-surface-container-low border border-outline-variant rounded-md py-2.5 ps-3.5 pe-11 text-body-md text-on-surface outline-none focus:border-primary",
+                            error ? "border-error!" : "",
                         ].join(" ")}
                     />
                     <span className="absolute inset-y-0 inset-e-3 flex items-center gap-2 text-on-surface-variant">
@@ -181,16 +182,24 @@ export default function ChangePasswordPage() {
                         title="أمان الحساب"
                         description="لحماية حسابك، اختر كلمة مرور قوية ولا تشاركها مع أي شخص."
                     >
-                        <Field label="كلمة المرور الحالية">
+                        {/* كلمة المرور الحالية */}
+                        <div>
+                            <label className="block text-body-sm font-medium text-on-surface mb-2">
+                                كلمة المرور الحالية
+                            </label>
                             <PasswordField
                                 value={form.currentPassword}
                                 onChange={(v) => setField("currentPassword", v)}
                                 placeholder="أدخل كلمة المرور الحالية"
                                 autoComplete="current-password"
                             />
-                        </Field>
+                        </div>
 
-                        <Field label="كلمة المرور الجديدة">
+                        {/* كلمة المرور الجديدة */}
+                        <div>
+                            <label className="block text-body-sm font-medium text-on-surface mb-2">
+                                كلمة المرور الجديدة
+                            </label>
                             <PasswordField
                                 value={form.newPassword}
                                 onChange={(v) => setField("newPassword", v)}
@@ -199,9 +208,13 @@ export default function ChangePasswordPage() {
                                 error={sameAsCurrentError}
                             />
                             <PasswordRequirements value={form.newPassword} />
-                        </Field>
+                        </div>
 
-                        <Field label="تأكيد كلمة المرور الجديدة">
+                        {/* تأكيد كلمة المرور الجديدة */}
+                        <div>
+                            <label className="block text-body-sm font-medium text-on-surface mb-2">
+                                تأكيد كلمة المرور الجديدة
+                            </label>
                             <PasswordField
                                 value={form.confirmNewPassword}
                                 onChange={(v) => setField("confirmNewPassword", v)}
@@ -209,8 +222,9 @@ export default function ChangePasswordPage() {
                                 autoComplete="new-password"
                                 error={mismatchError}
                             />
-                        </Field>
+                        </div>
 
+                        {/* أزرار التحكم */}
                         <div className="flex items-center gap-3 pt-1">
                             <button
                                 type="button"

@@ -1,9 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
 import toastificationReducer from './slices/toastificationSlice'
-
+import meReducer from './slices/auth/meSlice'
 export const store = configureStore({
     reducer: {
         toastificationSlice: toastificationReducer,
+        me: meReducer
 
     },
 })

@@ -6,6 +6,15 @@ import {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+const getAuthHeaders = (): Record<string, string> => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    return {
+        accept: "*/*",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+};
+
+
 export const heroService = {
     getHeroInfo: async (): Promise<GetHeroInfoResponse> => {
         const response = await fetch(`${BASE_URL}/api/Deputy/api/HeroInfo`, {
@@ -40,9 +49,7 @@ export const heroService = {
 
         const response = await fetch(`${BASE_URL}/api/Deputy/api/HeroInfo`, {
             method: "PUT",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 

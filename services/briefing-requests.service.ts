@@ -7,13 +7,19 @@ import {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+const getAuthHeaders = (): Record<string, string> => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    return {
+        accept: "*/*",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+};
+
 export const briefingRequestsService = {
     getAll: async (): Promise<BriefingRequestApiResponse<BriefingRequestItem[]>> => {
         const response = await fetch(`${BASE_URL}/api/Motion`, {
             method: "GET",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
         });
 
         const data = await response.json().catch(() => null);
@@ -28,9 +34,7 @@ export const briefingRequestsService = {
     getById: async (motionId: number): Promise<BriefingRequestApiResponse<BriefingRequestItem>> => {
         const response = await fetch(`${BASE_URL}/api/Motion/${motionId}`, {
             method: "GET",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
         });
 
         const data = await response.json().catch(() => null);
@@ -52,9 +56,7 @@ export const briefingRequestsService = {
 
         const response = await fetch(`${BASE_URL}/api/Motion`, {
             method: "POST",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -77,9 +79,7 @@ export const briefingRequestsService = {
 
         const response = await fetch(`${BASE_URL}/api/Motion/${motionId}`, {
             method: "PUT",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -95,9 +95,7 @@ export const briefingRequestsService = {
     delete: async (motionId: number): Promise<BriefingRequestApiResponse<number>> => {
         const response = await fetch(`${BASE_URL}/api/Motion/${motionId}`, {
             method: "DELETE",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
         });
 
         const data = await response.json().catch(() => null);

@@ -10,13 +10,19 @@ import {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+const getAuthHeaders = (): Record<string, string> => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    return {
+        accept: "*/*",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+};
+
 export const videoService = {
     getAll: async (): Promise<GetVideosResponse> => {
         const response = await fetch(`${BASE_URL}/api/DeputyWord`, {
             method: "GET",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
         });
 
         const data = await response.json().catch(() => null);
@@ -31,9 +37,7 @@ export const videoService = {
     getById: async (videoId: number): Promise<GetVideoByIdResponse> => {
         const response = await fetch(`${BASE_URL}/api/DeputyWord/${videoId}`, {
             method: "GET",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
         });
 
         const data = await response.json().catch(() => null);
@@ -54,9 +58,7 @@ export const videoService = {
 
         const response = await fetch(`${BASE_URL}/api/DeputyWord`, {
             method: "POST",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -78,9 +80,7 @@ export const videoService = {
 
         const response = await fetch(`${BASE_URL}/api/DeputyWord/${videoId}`, {
             method: "PUT",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -96,9 +96,7 @@ export const videoService = {
     delete: async (videoId: number): Promise<DeleteVideoResponse> => {
         const response = await fetch(`${BASE_URL}/api/DeputyWord/${videoId}`, {
             method: "DELETE",
-            headers: {
-                "accept": "*/*",
-            },
+            headers: getAuthHeaders(),
         });
 
         const data = await response.json().catch(() => null);

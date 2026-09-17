@@ -1,4 +1,4 @@
-import ChangePasswordPage from '@/views/ChangePasswordPage'
+import ChangePasswordPage from '@/views/shared-dashboard/ChangePasswordPage'
 import React from 'react'
 
 function page() {

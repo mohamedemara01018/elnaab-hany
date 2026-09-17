@@ -3,6 +3,7 @@ import { Tajawal, Cairo, Amiri } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "@/provider/StoreProvider";
 import ToastificationProvider from "@/provider/ToastificationProvider";
+import { AuthGuardProvider } from "@/provider/AuthGuardProvider";
 
 const tajawal = Tajawal({
   subsets: ["arabic"],
@@ -87,7 +88,9 @@ export default function RootLayout({
       <body className={`${tajawal.variable} ${cairo.variable} ${amiri.variable} min-h-full flex flex-col transition-colors duration-200 antialiased`}>
         <StoreProvider>
           <ToastificationProvider>
-            {children}
+            <AuthGuardProvider>
+              {children}
+            </AuthGuardProvider>
           </ToastificationProvider>
         </StoreProvider>
       </body>

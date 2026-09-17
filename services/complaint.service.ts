@@ -7,29 +7,44 @@ import {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+const getAuthHeaders = (): Record<string, string> => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    return {
+        accept: "*/*",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+};
+
 export const complaintService = {
-    // POST /api/complaint (multipart/form-data - Public)
+    /**
+     * POST /api/Complaint
+     * إضافة شكوى / اقتراح جديد (Public Endpoint)
+     */
     createComplaint: async (payload: CreateComplaintPayload): Promise<ApiResponse<string>> => {
         const formData = new FormData();
 
         formData.append("RequestType", payload.RequestType.toString());
         formData.append("NationalId", payload.NationalId);
         formData.append("FullName", payload.FullName);
-        if (payload.BirthDate) formData.append("BirthDate", payload.BirthDate);
+
+        if (payload.BirthDate?.trim()) {
+            formData.append("BirthDate", payload.BirthDate.trim());
+        }
+
         formData.append("Phone", payload.Phone);
         formData.append("Title", payload.Title);
         formData.append("Description", payload.Description);
         formData.append("DepartmentId", payload.DepartmentId.toString());
         formData.append("OrganizationId", payload.OrganizationId.toString());
 
-        if (payload.Image) {
+        if (payload.Image && payload.Image instanceof File && payload.Image.size > 0) {
             formData.append("Image", payload.Image);
         }
 
         const response = await fetch(`${BASE_URL}/api/Complaint`, {
             method: "POST",
             headers: {
-                "accept": "*/*",
+                accept: "*/*",
             },
             body: formData,
         });
@@ -44,16 +59,14 @@ export const complaintService = {
         return data as ApiResponse<string>;
     },
 
-    // GET /{id}
+    /**
+     * GET /{id} or /api/Complaint/{id}
+     * جلب تفاصيل طلب محدد برقم الـ ID
+     */
     getComplaintById: async (id: number): Promise<ApiResponse<ComplaintDetail>> => {
-        const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-
         const response = await fetch(`${BASE_URL}/${id}`, {
             method: "GET",
-            headers: {
-                "accept": "*/*",
-                ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-            },
+            headers: getAuthHeaders(),
         });
 
         const responseText = await response.text();
@@ -66,16 +79,16 @@ export const complaintService = {
         return data as ApiResponse<ComplaintDetail>;
     },
 
-    // PUT /UpdateRequest
+    /**
+     * PUT /UpdateRequest
+     * تحديث حالة وأولوية الشكوى/الاقتراح
+     */
     updateRequest: async (payload: UpdateRequestPayload): Promise<ApiResponse<string>> => {
-        const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-
         const response = await fetch(`${BASE_URL}/UpdateRequest`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "accept": "*/*",
-                ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+                ...getAuthHeaders(),
             },
             body: JSON.stringify(payload),
         });
@@ -90,16 +103,14 @@ export const complaintService = {
         return data as ApiResponse<string>;
     },
 
-    // DELETE /{id}
+    /**
+     * DELETE /{id}
+     * حذف طلب الشكوى/الاقتراح
+     */
     deleteComplaint: async (id: number): Promise<ApiResponse<string>> => {
-        const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-
         const response = await fetch(`${BASE_URL}/${id}`, {
             method: "DELETE",
-            headers: {
-                "accept": "*/*",
-                ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-            },
+            headers: getAuthHeaders(),
         });
 
         const responseText = await response.text();

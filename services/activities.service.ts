@@ -4,6 +4,13 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
     ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/areas-of-work`
     : "https://deputyproject20260826153754-hvayeugeehdpf2hy.italynorth-01.azurewebsites.net/api/areas-of-work";
 
+const getAuthHeaders = (): Record<string, string> => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    return {
+        accept: "*/*",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+};
 export const activitiesService = {
     /**
      * Get all activities / areas of work
@@ -55,9 +62,7 @@ export const activitiesService = {
 
         const response = await fetch(BASE_URL, {
             method: "POST",
-            headers: {
-                accept: "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -86,9 +91,7 @@ export const activitiesService = {
 
         const response = await fetch(`${BASE_URL}/${areaId}`, {
             method: "PUT",
-            headers: {
-                accept: "*/*",
-            },
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -105,9 +108,7 @@ export const activitiesService = {
     delete: async (areaId: number): Promise<ApiResponse<number>> => {
         const response = await fetch(`${BASE_URL}/${areaId}`, {
             method: "DELETE",
-            headers: {
-                accept: "*/*",
-            },
+            headers: getAuthHeaders(),
         });
 
         if (!response.ok) {
