@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import Image from "next/image";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 import { staggerContainer, fadeUp, scaleIn } from "@/lib/motion-variants";
 import imgFallback from "@/public/hanyImage.jpg";
 import { HeroInfoData, GetHeroInfoResponse } from "@/types/hero.types";
@@ -56,7 +57,8 @@ export function Hero({ data }: HeroProps) {
               href="#complaints"
               className="btn-primary inline-flex items-center gap-2 px-6 py-3.5 font-display font-bold text-sm"
             >
-              تقديم شكوى <span>←</span>
+              <span>تقديم شكوى</span>
+              <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
             </motion.a>
             <motion.a
               whileHover={{ scale: 1.03 }}
@@ -89,14 +91,14 @@ export function Hero({ data }: HeroProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9, duration: 0.6 }}
-        className="text-center mt-14 text-xs text-on-surface-variant"
+        className="text-center mt-14 text-xs text-on-surface-variant flex flex-col items-center"
       >
-        اكتشف المزيد
+        <span>اكتشف المزيد</span>
         <motion.div
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
         >
-          ↓
+          <ChevronDown className="w-4 h-4 mt-1 shrink-0" aria-hidden="true" />
         </motion.div>
       </motion.div>
     </section>

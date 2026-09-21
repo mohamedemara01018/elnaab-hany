@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "motion/react";
+import { AlertTriangle, Lightbulb, ArrowLeft } from "lucide-react";
 import { UploadField } from "@/components/ui/upload-field";
 import { Department } from "@/types/department.types";
 import { Organization } from "@/types/organization.types";
@@ -18,7 +19,7 @@ interface CitizenRequestFormProps {
 
 const COPY = {
   complaint: {
-    icon: "⚠",
+    icon: AlertTriangle,
     eyebrow: "خدمة المواطن",
     title: "تقديم شكوى أو طلب",
     typeLabel: "نوع الشكوى أو الطلب",
@@ -26,10 +27,10 @@ const COPY = {
     detailsPlaceholder: "اكتب تفاصيل الشكوى أو الطلب بالتفصيل...",
     uploadLabel: "صورة مرفقة",
     uploadHint: "JPG / JPEG / PNG / WEBP — بحد أقصى 5MB",
-    submitLabel: "إرسال الشكوى أو الطلب ←",
+    submitLabelText: "إرسال الشكوى أو الطلب",
   },
   proposal: {
-    icon: "💡",
+    icon: Lightbulb,
     eyebrow: "شاركنا فكرتك",
     title: "تقديم مقترح",
     typeLabel: "مجال المقترح",
@@ -37,7 +38,7 @@ const COPY = {
     detailsPlaceholder: "اكتب فكرتك أو المقترح بالتفصيل...",
     uploadLabel: "صورة أو ملف مرفق",
     uploadHint: "JPG / JPEG / PNG / PDF — بحد أقصى 5MB",
-    submitLabel: "إرسال المقترح ←",
+    submitLabelText: "إرسال المقترح",
   },
 } as const;
 
@@ -132,8 +133,8 @@ export function CitizenRequestForm({
         style={{ boxShadow: "var(--shadow-level-1)" }}
       >
         <div className="flex items-center gap-3.5 mb-6">
-          <div className="w-11 h-11 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-lg">
-            {c.icon}
+          <div className="w-11 h-11 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+            <c.icon className="w-5 h-5 shrink-0" aria-hidden="true" />
           </div>
           <div>
             <span className="text-primary text-xs font-bold block">{c.eyebrow}</span>
@@ -275,9 +276,16 @@ export function CitizenRequestForm({
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isSubmitting}
-            className="btn-primary py-4 font-display font-extrabold text-sm disabled:opacity-50 cursor-pointer"
+            className="btn-primary py-4 font-display font-extrabold text-sm disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
           >
-            {isSubmitting ? "جاري الإرسال..." : c.submitLabel}
+            {isSubmitting ? (
+              "جاري الإرسال..."
+            ) : (
+              <>
+                <span>{c.submitLabelText}</span>
+                <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
+              </>
+            )}
           </motion.button>
         </form>
       </motion.div>

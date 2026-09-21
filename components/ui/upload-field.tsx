@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { Paperclip, X } from "lucide-react";
 
 interface UploadFieldProps {
   label: string;
@@ -49,7 +50,7 @@ export function UploadField({ label, optional, hint, onChange }: UploadFieldProp
         whileTap={{ scale: 0.99 }}
         className="border-2 border-dashed border-outline-variant rounded-lg p-6 flex flex-col items-center gap-1.5 cursor-pointer text-center"
       >
-        <div className="text-xl">📎</div>
+        <Paperclip className="w-6 h-6 text-primary shrink-0" aria-hidden="true" />
         <strong>اضغط لاختيار مرفق</strong>
         <span className="text-body-small font-normal">{hint}</span>
       </motion.div>
@@ -73,10 +74,11 @@ export function UploadField({ label, optional, hint, onChange }: UploadFieldProp
             <span className="truncate max-w-[80%] font-normal">{selectedFile.name}</span>
             <button
               type="button"
-              className="border-none bg-transparent text-error font-bold cursor-pointer hover:opacity-80 shrink-0"
+              className="border-none bg-transparent text-error font-bold cursor-pointer hover:opacity-80 shrink-0 inline-flex items-center gap-1"
               onClick={handleRemove}
             >
-              إزالة ×
+              <span>إزالة</span>
+              <X className="w-4 h-4 text-error shrink-0" aria-hidden="true" />
             </button>
           </motion.div>
         )}

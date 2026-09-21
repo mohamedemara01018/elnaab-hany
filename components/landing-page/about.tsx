@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import Image from "next/image";
+import { Calendar, MapPin, Clock, Landmark } from "lucide-react";
 import { Section } from "@/components/ui/section";
 import { SectionTitle } from "@/components/ui/section-title";
 import { FACTS } from "@/lib/data";
@@ -11,6 +12,27 @@ import { HeroInfoData, GetHeroInfoResponse } from "@/types/hero.types";
 
 interface AboutProps {
   data?: HeroInfoData | GetHeroInfoResponse | null;
+}
+
+function renderFactIcon(icon: string) {
+  const iconProps = { className: "w-5 h-5 text-primary shrink-0", "aria-hidden": true };
+  switch (icon) {
+    case "calendar":
+    case "📅":
+      return <Calendar {...iconProps} />;
+    case "mappin":
+    case "📍":
+      return <MapPin {...iconProps} />;
+    case "clock":
+    case "⏰":
+      return <Clock {...iconProps} />;
+    case "landmark":
+    case "🏛️":
+    case "🏛":
+      return <Landmark {...iconProps} />;
+    default:
+      return <MapPin {...iconProps} />;
+  }
 }
 
 export function About({ data }: AboutProps) {
@@ -24,10 +46,10 @@ export function About({ data }: AboutProps) {
 
   const facts = heroInfo
     ? [
-      { icon: "📅", label: "تاريخ الميلاد", value: heroInfo.birthOfDate || "19 يونيو 1983" },
-      { icon: "📍", label: "محل الإقامة", value: heroInfo.address || "مدينة بنها - القليوبية" },
-      { icon: "⏰", label: "مواعيد التواصل", value: heroInfo.appointment || "1 ظهراً - 10 مساءً" },
-      { icon: "🏛️", label: "الدائرة", value: heroInfo.circle || "بنها وكفر شكر" },
+      { icon: "calendar", label: "تاريخ الميلاد", value: heroInfo.birthOfDate || "19 يونيو 1983" },
+      { icon: "mappin", label: "محل الإقامة", value: heroInfo.address || "مدينة بنها - القليوبية" },
+      { icon: "clock", label: "مواعيد التواصل", value: heroInfo.appointment || "1 ظهراً - 10 مساءً" },
+      { icon: "landmark", label: "الدائرة", value: heroInfo.circle || "بنها وكفر شكر" },
     ]
     : FACTS;
 
@@ -90,7 +112,7 @@ export function About({ data }: AboutProps) {
           >
             {facts.map((f) => (
               <motion.div key={f.label} variants={fadeUp} className="bg-surface-container rounded-lg p-4">
-                <span>{f.icon}</span>
+                <div className="mb-1">{renderFactIcon(f.icon)}</div>
                 <small className="block text-on-surface-variant text-xs mt-1.5">{f.label}</small>
                 <strong className="text-title-card">{f.value}</strong>
               </motion.div>

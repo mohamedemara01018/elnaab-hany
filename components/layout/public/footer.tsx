@@ -1,3 +1,5 @@
+import { ArrowLeft } from "lucide-react";
+
 export function Footer() {
   return (
     <footer className="bg-surface-container-high text-inverse-on-surface py-14 pb-6">
@@ -42,8 +44,9 @@ export function Footer() {
       </div>
 
       <div className="text-center mt-10">
-        <a href="login" className="text-gold-highlight text-sm" aria-label="دخول الإدارة">
-          دخول الإدارة ←
+        <a href="login" className="text-gold-highlight text-sm inline-flex items-center gap-1 hover:underline" aria-label="دخول الإدارة">
+          <span>دخول الإدارة</span>
+          <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
         </a>
       </div>
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Image, { StaticImageData } from "next/image";
+import { MapPin, Calendar, ArrowLeft, X } from "lucide-react";
 import { fadeUp, staggerContainer, revealViewport } from "@/lib/motion-variants";
 import defaultImg from "@/public/help_people.jpg";
 
@@ -78,8 +79,9 @@ export function NumberedCardGrid({ items }: NumberedCardGridProps) {
                     {numberLabel}
                   </span>
                   {location && (
-                    <span className="text-xs bg-surface-container-high/70 px-3 py-1 rounded-full text-on-surface-variant font-semibold backdrop-blur-xs">
-                      📍 {location}
+                    <span className="text-xs bg-surface-container-high/70 px-3 py-1 rounded-full text-on-surface-variant font-semibold backdrop-blur-xs inline-flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 shrink-0 text-primary" aria-hidden="true" />
+                      <span>{location}</span>
                     </span>
                   )}
                 </div>
@@ -103,8 +105,9 @@ export function NumberedCardGrid({ items }: NumberedCardGridProps) {
 
                 {/* Date tag if available */}
                 {date && (
-                  <span className="text-xs text-primary font-medium">
-                    📅 {new Date(date).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" })}
+                  <span className="text-xs text-primary font-medium inline-flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <span>{new Date(date).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" })}</span>
                   </span>
                 )}
 
@@ -119,9 +122,7 @@ export function NumberedCardGrid({ items }: NumberedCardGridProps) {
               {/* Action Footer Link */}
               <div className="mt-5 pt-3.5 border-t border-outline-variant/20 flex items-center justify-between text-xs font-bold text-primary">
                 <span>استعرض التفاصيل</span>
-                <span className="text-base group-hover:-translate-x-1.5 transition-transform duration-300">
-                  ←
-                </span>
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1.5 transition-transform duration-300 shrink-0" aria-hidden="true" />
               </div>
             </motion.article>
           );
@@ -149,9 +150,10 @@ export function NumberedCardGrid({ items }: NumberedCardGridProps) {
               <button
                 type="button"
                 onClick={() => setSelectedItem(null)}
+                aria-label="إغلاق النافذة"
                 className="absolute top-4 left-4 z-10 w-10 h-10 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all font-bold cursor-pointer backdrop-blur-sm shadow-md hover:scale-105"
               >
-                ✕
+                <X className="w-5 h-5 shrink-0" aria-hidden="true" />
               </button>
 
               <div className="relative w-full h-72 sm:h-96 bg-surface-container">
@@ -178,13 +180,15 @@ export function NumberedCardGrid({ items }: NumberedCardGridProps) {
                 {(selectedItem.location || selectedItem.date) && (
                   <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-on-surface-variant font-medium">
                     {selectedItem.location && (
-                      <span className="bg-surface-container px-3.5 py-1.5 rounded-lg border border-outline-variant/20">
-                        📍 {selectedItem.location}
+                      <span className="bg-surface-container px-3.5 py-1.5 rounded-lg border border-outline-variant/20 inline-flex items-center gap-1.5">
+                        <MapPin className="w-4 h-4 shrink-0 text-primary" aria-hidden="true" />
+                        <span>{selectedItem.location}</span>
                       </span>
                     )}
                     {selectedItem.date && (
-                      <span className="bg-surface-container px-3.5 py-1.5 rounded-lg border border-outline-variant/20">
-                        📅 {new Date(selectedItem.date).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" })}
+                      <span className="bg-surface-container px-3.5 py-1.5 rounded-lg border border-outline-variant/20 inline-flex items-center gap-1.5">
+                        <Calendar className="w-4 h-4 shrink-0 text-primary" aria-hidden="true" />
+                        <span>{new Date(selectedItem.date).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" })}</span>
                       </span>
                     )}
                   </div>

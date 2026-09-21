@@ -22,10 +22,10 @@ export const NAV_LINKS: NavLink[] = [
 ];
 
 export const FACTS: Fact[] = [
-  { icon: "📅", label: "تاريخ الميلاد", value: "19 يونيو 1983" },
-  { icon: "📍", label: "محل الإقامة", value: "مدينة بنها - القليوبية" },
-  { icon: "⏰", label: "مواعيد التواصل", value: "1 ظهراً - 10 مساءً" },
-  { icon: "🏛️", label: "الدائرة", value: "بنها وكفر شكر" },
+  { icon: "calendar", label: "تاريخ الميلاد", value: "19 يونيو 1983" },
+  { icon: "mappin", label: "محل الإقامة", value: "مدينة بنها - القليوبية" },
+  { icon: "clock", label: "مواعيد التواصل", value: "1 ظهراً - 10 مساءً" },
+  { icon: "landmark", label: "الدائرة", value: "بنها وكفر شكر" },
 ];
 
 export const STATS: Stat[] = [
@@ -44,11 +44,11 @@ export const WORK_ITEMS: WorkItem[] = [
 
 
 export const CONTACT_CARDS: ContactCard[] = [
-  { icon: "📍", title: "العنوان", body: "مكتب النائب — برج افنان - مدينة كفر شكر - القليوبية", link: { label: "فتح الموقع على الخريطة ↗", href: "https://maps.app.goo.gl/aYWMiooMkypRnM1z9" } },
-  { icon: "☎", title: "الهاتف", body: "01024949496 — متاح يومياً", link: { label: "اتصل الآن", href: "tel:01024949496" } },
-  { icon: "f", title: "Facebook", body: "الصفحة الرسمية — تواصل معنا عبر Facebook", link: { label: "زيارة الصفحة ↗", href: "https://web.facebook.com/profile.php?id=61560394937903" } },
-  { icon: "💬", title: "WhatsApp", body: "01114418110 — تواصل معنا مباشرة", link: { label: "فتح WhatsApp ↗", href: "https://wa.me/201114418110" } },
-  { icon: "◷", title: "مواعيد التواصل", body: "يومياً — 1:00 ظهراً - 10:00 مساءً" },
+  { icon: "mappin", title: "العنوان", body: "مكتب النائب — برج افنان - مدينة كفر شكر - القليوبية", link: { label: "فتح الموقع على الخريطة", href: "https://maps.app.goo.gl/aYWMiooMkypRnM1z9" } },
+  { icon: "phone", title: "الهاتف", body: "01024949496 — متاح يومياً", link: { label: "اتصل الآن", href: "tel:01024949496" } },
+  { icon: "facebook", title: "Facebook", body: "الصفحة الرسمية — تواصل معنا عبر Facebook", link: { label: "زيارة الصفحة", href: "https://web.facebook.com/profile.php?id=61560394937903" } },
+  { icon: "whatsapp", title: "WhatsApp", body: "01114418110 — تواصل معنا مباشرة", link: { label: "فتح WhatsApp", href: "https://wa.me/201114418110" } },
+  { icon: "clock", title: "مواعيد التواصل", body: "يومياً — 1:00 ظهراً - 10:00 مساءً" },
 ];
 
 export const TEAM: TeamMember[] = [

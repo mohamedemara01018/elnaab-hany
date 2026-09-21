@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ImageOff } from "lucide-react";
+import { ImageOff, MapPin, Calendar } from "lucide-react";
 import { Section } from "@/components/ui/section";
 import { SectionTitle } from "@/components/ui/section-title";
 import Image from "next/image";
@@ -63,13 +63,15 @@ export function Gallery({ data }: GalleryProps) {
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   {item.location && (
-                    <span className="font-bold text-primary px-3 py-1 rounded-xl bg-primary/10 border border-primary/20">
-                      📍 {item.location}
+                    <span className="font-bold text-primary px-3 py-1 rounded-xl bg-primary/10 border border-primary/20 inline-flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      <span>{item.location}</span>
                     </span>
                   )}
                   {formattedDate && (
-                    <span className="text-on-surface-variant/80 font-medium px-2.5 py-1 rounded-lg bg-surface-container-high/60">
-                      📅 {formattedDate}
+                    <span className="text-on-surface-variant/80 font-medium px-2.5 py-1 rounded-lg bg-surface-container-high/60 inline-flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      <span>{formattedDate}</span>
                     </span>
                   )}
                 </div>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { motion } from "motion/react";
-import { VideoOff, Play } from "lucide-react";
+import { VideoOff, Play, Video } from "lucide-react";
 import { GetVideosResponse } from "@/types/video.types";
 import { getMediaUrl } from "@/utils/functions.utils";
 import EmptyState from "@/components/ui/Emptystate";
@@ -81,8 +81,9 @@ export function Videos({ data }: VideosProps) {
                   className="card flex flex-col gap-3.5 bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 hover:border-primary/40 shadow-sm hover:shadow-xl transition-all duration-300 group"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-primary px-3 py-1 rounded-xl bg-primary/10 border border-primary/20">
-                      🎥 كلمة برلمانية
+                    <span className="text-xs font-bold text-primary px-3 py-1 rounded-xl bg-primary/10 border border-primary/20 inline-flex items-center gap-1.5">
+                      <Video className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      <span>كلمة برلمانية</span>
                     </span>
                   </div>
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, TargetAndTransition } from "motion/react";
+import { Menu, X } from "lucide-react";
 import { NAV_LINKS } from "@/lib/data";
 import ToggleTheme from "../../ui/ToggleTheme";
 import UserImage from "../../ui/UserImage";
@@ -68,11 +69,11 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
-            aria-label="فتح القائمة"
+            aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
             aria-expanded={menuOpen}
-            className="md:hidden border-none bg-transparent text-2xl text-on-surface"
+            className="md:hidden border-none bg-transparent p-1.5 text-on-surface cursor-pointer flex items-center justify-center"
           >
-            ☰
+            {menuOpen ? <X className="w-6 h-6 shrink-0" aria-hidden="true" /> : <Menu className="w-6 h-6 shrink-0" aria-hidden="true" />}
           </button>
         </div>
 
