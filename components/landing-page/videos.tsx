@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { motion } from "motion/react";
 import { VideoOff, Play, Video } from "lucide-react";
@@ -5,6 +7,7 @@ import { GetVideosResponse } from "@/types/video.types";
 import { getMediaUrl } from "@/utils/functions.utils";
 import EmptyState from "@/components/ui/Emptystate";
 import { fadeUp, staggerContainer, revealViewport } from "@/lib/motion-variants";
+import posterImg from "@/public/help_people.jpg";
 
 interface VideosProps {
   data: GetVideosResponse | null;
@@ -22,8 +25,7 @@ export function Videos({ data }: VideosProps) {
 
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
-    // eslint-disable-next-line prefer-const
-    let cleanUrl = url.trim();
+    const cleanUrl = url.trim();
 
     // Handle youtube.com/watch?v=ID
     if (cleanUrl.includes("watch?v=")) {
@@ -105,6 +107,7 @@ export function Videos({ data }: VideosProps) {
                         src={url}
                         controls
                         preload="none"
+                        poster={posterImg.src}
                         aria-label={title}
                         className="w-full h-full object-cover bg-black"
                       />
@@ -117,7 +120,7 @@ export function Videos({ data }: VideosProps) {
                           className="object-cover opacity-85 group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
-                          <div className="w-13 h-13 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold shadow-lg group-hover:scale-110 transition-transform">
+                          <div className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold shadow-lg group-hover:scale-110 transition-transform">
                             <Play size={20} className="fill-current ml-0.5" />
                           </div>
                         </div>

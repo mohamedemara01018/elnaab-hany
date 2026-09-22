@@ -39,7 +39,7 @@ export function Navbar() {
   const linkTapAnimation = { scale: 0.95 };
 
   const fullName = heroInfo?.fullName || "النائب هاني شحاتة";
-  const avatarUrl = getMediaUrl(heroInfo?.mediaUrl) || "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg";
+  const avatarUrl = getMediaUrl(heroInfo?.mediaUrl)
 
   return (
     <motion.header
