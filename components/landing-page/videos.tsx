@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { VideoOff, Play, Video } from "lucide-react";
@@ -7,10 +8,71 @@ import { GetVideosResponse } from "@/types/video.types";
 import { getMediaUrl } from "@/utils/functions.utils";
 import EmptyState from "@/components/ui/Emptystate";
 import { fadeUp, staggerContainer, revealViewport } from "@/lib/motion-variants";
-import posterImg from "@/public/help_people.jpg";
+import defaultPoster from "@/public/help_people.jpg";
+import generateVideoPoster from "../ui/generateVideoPoster";
 
 interface VideosProps {
   data: GetVideosResponse | null;
+}
+
+/**
+ * Utility function to transform various YouTube URLs into embeddable format.
+ */
+function getEmbedUrl(url: string): string {
+  if (!url) return "";
+  const cleanUrl = url.trim();
+
+  if (cleanUrl.includes("watch?v=")) {
+    return cleanUrl.replace("watch?v=", "embed/").split("&")[0];
+  }
+  if (cleanUrl.includes("youtu.be/")) {
+    return cleanUrl.replace("youtu.be/", "youtube.com/embed/");
+  }
+  if (cleanUrl.includes("youtube.com/shorts/")) {
+    return cleanUrl.replace("youtube.com/shorts/", "youtube.com/embed/");
+  }
+  return cleanUrl;
+}
+
+/**
+ * Custom video component that dynamically generates a poster frame from video source.
+ */
+function AutoPosterVideo({ url, title }: { url: string; title: string }) {
+  const [generatedPoster, setGeneratedPoster] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (url) {
+      // Capture frame at 1.0 second mark
+      generateVideoPoster(url, 1.0)
+        .then((posterUrl) => {
+          if (isMounted) {
+            setGeneratedPoster(posterUrl);
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            setGeneratedPoster(defaultPoster.src);
+          }
+        });
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [url]);
+
+  return (
+    <video
+      src={`${url}#t=0.1`}
+      controls
+      preload="metadata"
+      poster={generatedPoster || defaultPoster.src}
+      aria-label={title}
+      className="w-full h-full object-cover bg-black"
+    />
+  );
 }
 
 export function Videos({ data }: VideosProps) {
@@ -22,25 +84,6 @@ export function Videos({ data }: VideosProps) {
       : null;
 
   const hasVideos = Array.isArray(videosList) && videosList.length > 0;
-
-  const getEmbedUrl = (url: string) => {
-    if (!url) return "";
-    const cleanUrl = url.trim();
-
-    // Handle youtube.com/watch?v=ID
-    if (cleanUrl.includes("watch?v=")) {
-      return cleanUrl.replace("watch?v=", "embed/").split("&")[0];
-    }
-    // Handle youtu.be/ID
-    if (cleanUrl.includes("youtu.be/")) {
-      return cleanUrl.replace("youtu.be/", "youtube.com/embed/");
-    }
-    // Handle youtube.com/shorts/ID
-    if (cleanUrl.includes("youtube.com/shorts/")) {
-      return cleanUrl.replace("youtube.com/shorts/", "youtube.com/embed/");
-    }
-    return cleanUrl;
-  };
 
   return (
     <section id="videos" className="bg-surface-container-low py-20 md:py-28">
@@ -103,14 +146,7 @@ export function Videos({ data }: VideosProps) {
                         className="w-full h-full border-0"
                       />
                     ) : hasValidVideo ? (
-                      <video
-                        src={url}
-                        controls
-                        preload="none"
-                        poster={posterImg.src}
-                        aria-label={title}
-                        className="w-full h-full object-cover bg-black"
-                      />
+                      <AutoPosterVideo url={url} title={title} />
                     ) : (
                       <div className="relative w-full h-full flex items-center justify-center cursor-pointer">
                         <Image
