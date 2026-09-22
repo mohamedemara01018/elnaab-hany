@@ -82,7 +82,7 @@ export function Navbar() {
             <motion.a
               key={l.href}
               href={l.href}
-              className="nav-link relative py-1 text-on-surface hover:text-primary transition-colors"
+              className=" nav-link relative py-1 text-on-surface hover:text-primary transition-colors"
               whileHover={linkHoverAnimation}
               whileTap={linkTapAnimation}
             >
