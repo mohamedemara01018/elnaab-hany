@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Section } from "@/components/ui/section";
-import { CitizenRequestForm } from "@/components/landing-page/citizen-request-form";
+import { CitizenRequestForm } from "@/components/landing-page/CitizenRequestForm";
 import { fadeUp, revealViewport } from "@/lib/motion-variants";
 import { departmentService } from "@/services/department.service";
 import { organizationService } from "@/services/organization.service";

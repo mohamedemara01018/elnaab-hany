@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CitizenRequestForm } from "@/components/landing-page/citizen-request-form";
+import { CitizenRequestForm } from "@/components/landing-page/CitizenRequestForm";
 import { departmentService } from "@/services/department.service";
 import { organizationService } from "@/services/organization.service";
 import { Department } from "@/types/department.types";

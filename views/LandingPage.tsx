@@ -1,16 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Hero } from "@/components/landing-page/hero";
-import { About } from "@/components/landing-page/about";
-import { Stats } from "@/components/landing-page/stats";
-import { Work } from "@/components/landing-page/work";
-import { Videos } from "@/components/landing-page/videos";
-import { Briefings } from "@/components/landing-page/briefings";
-import { Gallery } from "@/components/landing-page/gallery";
-import { Achievements } from "@/components/landing-page/achievements";
-import { Complaints } from "@/components/landing-page/complaints";
-import { Contact } from "@/components/landing-page/contact";
+
 import PublicLayout from "@/components/layout/public/PublicLayout";
 
 import { heroService } from "@/services/hero.service";
@@ -26,6 +17,18 @@ import { GetActivitiesVisitsResponse } from "@/types/activity-visit.types";
 import { BriefingRequestApiResponse, BriefingRequestItem } from "@/types/briefing-requests.types";
 import { GetVideosResponse } from "@/types/video.types";
 import { ApiResponse, Activity } from "@/types/activities.types";
+
+import { Contact } from "@/components/landing-page/Contact";
+import { Hero } from "@/components/landing-page/Hero";
+import { About } from "@/components/landing-page/About";
+import { Stats } from "@/components/landing-page/Stats";
+import { Work } from "@/components/landing-page/Work";
+import { Videos } from "@/components/landing-page/Videos";
+import { Briefings } from "@/components/landing-page/Briefings";
+import { Gallery } from "@/components/landing-page/Gallery";
+import { Achievements } from "@/components/landing-page/Achievements";
+import { Complaints } from "@/components/landing-page/Complaints";
+
 
 export default function LandingPage() {
     const [heroData, setHeroData] = useState<HeroInfoData | GetHeroInfoResponse | null>(null);
