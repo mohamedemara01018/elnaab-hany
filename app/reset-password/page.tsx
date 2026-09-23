@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { Suspense } from "react";
 import ResetPasswordForm from "@/components/reset-password/ResetPasswordForm";
 
 export default function Page() {

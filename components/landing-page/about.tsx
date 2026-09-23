@@ -73,6 +73,7 @@ export function About({ data }: AboutProps) {
             src={imgFallback}
             alt={`${name} - جولة ميدانية لخدمة المواطنين`}
             fill
+            sizes="(max-width: 768px) 100vw, 40vw"
             className="object-cover"
           />
           <div className="absolute bottom-4 left-4 bg-primary text-on-primary px-4 py-2.5 rounded-md font-display text-sm font-bold z-10">

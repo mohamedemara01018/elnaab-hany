@@ -1,10 +1,10 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { ActivityItem, ActivityItemRow } from "@/components/landing-dashboard/activities-management-dashboard-page/Activityitemrow";
 import { PageHeader } from "@/components/ui/Pageheader";
-import { SaveBar } from "@/components/landing-dashboard/hero-management-dashboard-page/Savebar";
 import { ActivityModal } from "@/modals/Activitymodal";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { activitiesService } from "@/services/activities.service";
@@ -14,7 +14,6 @@ import ImageModal from "@/components/ui/ImageModal";
 export default function ActivitiesManagementPage() {
     const [items, setItems] = useState<ActivityItem[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [saving, setSaving] = useState<boolean>(false);
     const [modalSubmitting, setModalSubmitting] = useState<boolean>(false);
     const [deleting, setDeleting] = useState<boolean>(false);
 
@@ -28,8 +27,8 @@ export default function ActivitiesManagementPage() {
     // حالة التحكم بـ ImageModal لمعاينة الصور
     const [previewImage, setPreviewImage] = useState<{ src: string; title: string } | null>(null);
 
-    // Fetch data from API
-    const fetchActivities = async () => {
+    // Fetch data from API using useCallback to avoid recreating the function on every render
+    const fetchActivities = useCallback(async () => {
         try {
             setLoading(true);
             const res = await activitiesService.getAll();
@@ -48,12 +47,11 @@ export default function ActivitiesManagementPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchActivities();
-    }, []);
+    }, [fetchActivities]);
 
     const openAddModal = () => {
         setActiveItem(undefined);
@@ -117,11 +115,6 @@ export default function ActivitiesManagementPage() {
         }
     };
 
-    const handleSave = () => {
-        setSaving(true);
-        setTimeout(() => setSaving(false), 900);
-    };
-
     const targetDeleteItem = items.find((item) => item.id === deletingItemId);
 
     return (
@@ -129,7 +122,7 @@ export default function ActivitiesManagementPage() {
             <PageHeader
                 breadcrumb="إدارة الموقع"
                 title="الأنشطة والفعاليات"
-                lastSavedLabel="آخر حفظ: منذ دقيقة"
+                lastSavedLabel="يتم التحديث مباشرة عند إجراء التغييرات"
             />
 
             <div className="flex-1 flex flex-col gap-6 px-6 md:px-10 pb-6">

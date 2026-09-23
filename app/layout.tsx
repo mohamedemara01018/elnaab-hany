@@ -29,6 +29,7 @@ const amiri = Amiri({
 const imagePath = "/hanyImage.jpg?v=2"
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://elnaabhany.com"),
   title: "النائب هاني شحاتة | الموقع الرسمي - عضو مجلس النواب عن دائرة بنها وكفر شكر",
   description:
     "الموقع الرسمي للنائب هاني شحاتة، عضو مجلس النواب عن دائرة بنها وكفر شكر. تواصل مباشر مع مكتب النائب، تقديم الشكاوى والمقترحات، ومتابعة أهم الملفات والأنشطة والزيارات الميدانية.",

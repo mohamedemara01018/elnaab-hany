@@ -12,13 +12,12 @@ import { Organization } from "@/types/organization.types";
 interface CreateComplaintModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSuccess: () => void;
+    onSuccess?: () => void;
 }
 
 export function CreateComplaintModal({
     isOpen,
     onClose,
-    onSuccess,
 }: CreateComplaintModalProps) {
     const [formTab, setFormTab] = useState<"complaint" | "proposal">("complaint");
     const [departments, setDepartments] = useState<Department[]>([]);

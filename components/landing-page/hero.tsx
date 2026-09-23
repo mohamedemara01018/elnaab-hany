@@ -80,6 +80,7 @@ export function Hero({ data }: HeroProps) {
             src={imageSrc}
             alt={`النائب ${name} - ${title}`}
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"
             priority
             unoptimized={typeof imageSrc === "string"}

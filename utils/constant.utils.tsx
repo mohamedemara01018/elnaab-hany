@@ -1,7 +1,5 @@
 import {
     LayoutGrid,
-    FolderCog,
-    MessagesSquare,
     CalendarDays,
     Settings,
     Video,

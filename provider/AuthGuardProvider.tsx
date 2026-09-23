@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { decodeJwt, JWTPayload } from "jose";
 import { UserRole } from "@/utils/enums.utils";
@@ -37,89 +36,128 @@ const matchRoute = (currentPath: string, routes: string[]) => {
     });
 };
 
+interface AuthInfo {
+    token: string | null;
+    userRole?: UserRole;
+    isValid: boolean;
+}
+
+let cachedToken: string | null = null;
+let cachedAuthInfo: AuthInfo = { token: null, isValid: false };
+
+function subscribeStorage(callback: () => void) {
+    window.addEventListener("storage", callback);
+    return () => window.removeEventListener("storage", callback);
+}
+
+function getStoredAuthInfo(): AuthInfo {
+    if (typeof window === "undefined") {
+        return { token: null, isValid: false };
+    }
+    const token = localStorage.getItem("accessToken");
+    if (token === cachedToken) {
+        return cachedAuthInfo;
+    }
+    cachedToken = token;
+    if (!token) {
+        cachedAuthInfo = { token: null, isValid: false };
+        return cachedAuthInfo;
+    }
+    try {
+        const rawPayload = decodeJwt(token) as TokenPayload;
+        const userRole = rawPayload[ROLE_CLAIM] || rawPayload.role;
+        const isExpired = Boolean(rawPayload.exp && rawPayload.exp * 1000 < Date.now());
+        if (isExpired) {
+            localStorage.removeItem("accessToken");
+            cachedAuthInfo = { token: null, isValid: false };
+        } else {
+            cachedAuthInfo = { token, userRole, isValid: true };
+        }
+    } catch {
+        localStorage.removeItem("accessToken");
+        cachedAuthInfo = { token: null, isValid: false };
+    }
+    return cachedAuthInfo;
+}
+
+function getServerAuthInfo(): AuthInfo {
+    return { token: null, isValid: false };
+}
+
 export function AuthGuardProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
-    const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
+    const authInfo = useSyncExternalStore(subscribeStorage, getStoredAuthInfo, getServerAuthInfo);
+
+    const isAuthRoute = matchRoute(pathname, authRoutes);
+    const isAdminRoute = matchRoute(pathname, adminRoutes);
+    const isEmployeeRoute = matchRoute(pathname, employeeRoutes);
+    const isSocialRoute = matchRoute(pathname, socialRoutes);
+    const isSharedProtectedRoute = matchRoute(pathname, sharedProtectedRoutes);
+
+    const isProtectedRoute =
+        isAdminRoute || isEmployeeRoute || isSocialRoute || isSharedProtectedRoute;
+
+    let isAuthorized = false;
+
+    if (!authInfo.isValid) {
+        if (!isProtectedRoute) {
+            isAuthorized = true;
+        }
+    } else {
+        const userRole = authInfo.userRole;
+        if (isAuthRoute) {
+            isAuthorized = false;
+        } else if (isAdminRoute && userRole !== UserRole.ADMIN) {
+            isAuthorized = false;
+        } else if (isEmployeeRoute && userRole !== UserRole.EMPLOYEE) {
+            isAuthorized = false;
+        } else if (isSocialRoute && userRole !== UserRole.SOCIAL) {
+            isAuthorized = false;
+        } else if (matchRoute(pathname, ["/profile"]) && userRole !== UserRole.EMPLOYEE) {
+            isAuthorized = false;
+        } else {
+            isAuthorized = true;
+        }
+    }
 
     useEffect(() => {
-        setIsAuthorized(false);
-        const token = localStorage.getItem("accessToken");
-
-        const isAuthRoute = matchRoute(pathname, authRoutes);
-        const isAdminRoute = matchRoute(pathname, adminRoutes);
-        const isEmployeeRoute = matchRoute(pathname, employeeRoutes);
-        const isSocialRoute = matchRoute(pathname, socialRoutes);
-        const isSharedProtectedRoute = matchRoute(pathname, sharedProtectedRoutes);
-
-        const isProtectedRoute =
-            isAdminRoute || isEmployeeRoute || isSocialRoute || isSharedProtectedRoute;
-
-        // --------------------------------
-        // 1. NO TOKEN
-        // --------------------------------
-        if (!token) {
+        if (!authInfo.isValid) {
             if (isProtectedRoute) {
                 router.replace("/login");
-                return;
             }
-            setIsAuthorized(true);
             return;
         }
 
-        // --------------------------------
-        // 2. DECODE TOKEN USING JOSE
-        // --------------------------------
-        try {
-            const rawPayload = decodeJwt(token) as TokenPayload;
-            const userRole = rawPayload[ROLE_CLAIM] || rawPayload.role;
-            console.log('rawpayload', rawPayload);
+        const userRole = authInfo.userRole;
 
-            // Check Expiration
-            if (rawPayload.exp && rawPayload.exp * 1000 < Date.now()) {
-                localStorage.removeItem("accessToken");
-                router.replace("/login");
-                return;
-            }
-
-            // Prevent logged-in users from accessing auth pages (login, register, etc.)
-            if (isAuthRoute) {
-                router.replace("/");
-                return;
-            }
-
-            // --------------------------------
-            // 3. ROLE-BASED ACCESS CONTROL
-            // --------------------------------
-            if (isAdminRoute && userRole !== UserRole.ADMIN) {
-                router.replace("/");
-                return;
-            }
-
-            if (isEmployeeRoute && userRole !== UserRole.EMPLOYEE) {
-                router.replace("/");
-                return;
-            }
-
-            if (isSocialRoute && userRole !== UserRole.SOCIAL) {
-                router.replace("/");
-                return;
-            }
-
-            // Restrict /profile strictly to EMPLOYEE role
-            const isProfileRoute = matchRoute(pathname, ["/profile"]);
-            if (isProfileRoute && userRole !== UserRole.EMPLOYEE) {
-                router.replace("/");
-                return;
-            }
-
-            setIsAuthorized(true);
-        } catch (error) {
-            console.error("Invalid token found in localStorage:", error);
-            localStorage.removeItem("accessToken");
-            router.replace("/login");
+        // Prevent logged-in users from accessing auth pages
+        if (isAuthRoute) {
+            router.replace("/");
+            return;
         }
-    }, [pathname, router]);
+
+        // Role-based access control
+        if (isAdminRoute && userRole !== UserRole.ADMIN) {
+            router.replace("/");
+            return;
+        }
+
+        if (isEmployeeRoute && userRole !== UserRole.EMPLOYEE) {
+            router.replace("/");
+            return;
+        }
+
+        if (isSocialRoute && userRole !== UserRole.SOCIAL) {
+            router.replace("/");
+            return;
+        }
+
+        if (matchRoute(pathname, ["/profile"]) && userRole !== UserRole.EMPLOYEE) {
+            router.replace("/");
+            return;
+        }
+    }, [pathname, router, authInfo, isProtectedRoute, isAuthRoute, isAdminRoute, isEmployeeRoute, isSocialRoute]);
 
     if (!isAuthorized) {
         return null;
@@ -127,3 +165,4 @@ export function AuthGuardProvider({ children }: { children: React.ReactNode }) {
 
     return <>{children}</>;
 }
+

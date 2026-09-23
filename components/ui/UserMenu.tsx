@@ -55,6 +55,7 @@ export function UserMenu({ displayName, displayRole, imageUrl }: UserMenuProps) 
                             src={imageUrl}
                             alt={displayName}
                             fill
+                            sizes="36px"
                             className="object-cover"
                         />
                     ) : (

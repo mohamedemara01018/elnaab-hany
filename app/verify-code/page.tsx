@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { Suspense } from "react";
 import VerifyCodeForm from "@/components/verify-code/VerifyCodeForm";
 
 export default function Page() {

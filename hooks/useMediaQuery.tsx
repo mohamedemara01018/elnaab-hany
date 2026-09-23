@@ -1,42 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-export function useMediaQuery(query: string) {
-    const [matches, setMatches] = useState(() => {
-        // Set initial state safely (handles SSR environments)
-        if (typeof window !== 'undefined') {
+export function useMediaQuery(query: string): boolean {
+    const [matches, setMatches] = useState<boolean>(() => {
+        if (typeof window !== "undefined") {
             return window.matchMedia(query).matches;
         }
         return false;
     });
 
     useEffect(() => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === "undefined") return;
 
         const mediaQueryList = window.matchMedia(query);
+        const updateMatch = () => {
+            setMatches(mediaQueryList.matches);
+        };
 
-        // Define a listener function to update state
-        const listener = (event: { matches: boolean | ((prevState: boolean) => boolean); }) => setMatches(event.matches);
+        // Initial sync
+        updateMatch();
 
-        // Attach listener (supports older browsers via addListener)
-        if (mediaQueryList.addEventListener) {
-            mediaQueryList.addEventListener('change', listener);
-        } else {
-            mediaQueryList.addListener(listener); // Fallback
-        }
-
-        // Set initial true/false value on mount
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setMatches(mediaQueryList.matches);
-
-        // Clean up listener on unmount
+        mediaQueryList.addEventListener("change", updateMatch);
         return () => {
-            if (mediaQueryList.removeEventListener) {
-                mediaQueryList.removeEventListener('change', listener);
-            } else {
-                mediaQueryList.removeListener(listener); // Fallback
-            }
+            mediaQueryList.removeEventListener("change", updateMatch);
         };
     }, [query]);
 
     return matches;
 }
+

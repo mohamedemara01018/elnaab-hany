@@ -92,6 +92,7 @@ export function NumberedCardGrid({ items }: NumberedCardGridProps) {
                     src={imageSrc}
                     alt={title || "صورة"}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
                     unoptimized={typeof imageSrc === "string"}
                   />
@@ -161,6 +162,7 @@ export function NumberedCardGrid({ items }: NumberedCardGridProps) {
                   src={selectedItem.imageSrc}
                   alt={selectedItem.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, 672px"
                   className="object-cover"
                   unoptimized={typeof selectedItem.imageSrc === "string"}
                 />

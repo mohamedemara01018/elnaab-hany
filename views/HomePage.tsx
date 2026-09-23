@@ -28,7 +28,6 @@ export default function HomePage() {
     }
 
     const userName = me?.name || 'مستخدم';
-    console.log(me)
     switch (me?.role) {
         case UserRole.SOCIAL:
             return (

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export function Footer() {
@@ -44,10 +45,10 @@ export function Footer() {
       </div>
 
       <div className="text-center mt-10">
-        <a href="login" className="text-gold-highlight text-sm inline-flex items-center gap-1 hover:underline" aria-label="دخول الإدارة">
+        <Link href="/login" className="text-gold-highlight text-sm inline-flex items-center gap-1 hover:underline" aria-label="دخول الإدارة">
           <span>دخول الإدارة</span>
           <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
-        </a>
+        </Link>
       </div>
 
       <div className="wrapper text-center mt-6 pt-5 border-t border-white/10 text-xs text-on-surface-variant">

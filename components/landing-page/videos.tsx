@@ -153,6 +153,7 @@ export function Videos({ data }: VideosProps) {
                           src="/700642161_122221074338346497_4382501221500797653_n.jpg"
                           alt={title}
                           fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           className="object-cover opacity-85 group-hover:scale-105 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-black/35 flex items-center justify-center">

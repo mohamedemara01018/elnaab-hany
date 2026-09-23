@@ -15,25 +15,41 @@ const getAuthHeaders = (): Record<string, string> => {
 };
 
 
+let heroInfoCache: Promise<GetHeroInfoResponse> | null = null;
+
 export const heroService = {
-    getHeroInfo: async (): Promise<GetHeroInfoResponse> => {
-        const response = await fetch(`${BASE_URL}/api/Deputy/api/HeroInfo`, {
-            method: "GET",
-            headers: {
-                "accept": "*/*",
-            },
-        });
-
-        const data = await response.json().catch(() => null);
-
-        if (!response.ok) {
-            throw new Error(data?.message || data?.error || `HTTP error! status: ${response.status}`);
+    getHeroInfo: async (forceRefresh = false): Promise<GetHeroInfoResponse> => {
+        if (!forceRefresh && heroInfoCache) {
+            return heroInfoCache;
         }
 
-        return data as GetHeroInfoResponse;
+        heroInfoCache = (async () => {
+            try {
+                const response = await fetch(`${BASE_URL}/api/Deputy/api/HeroInfo`, {
+                    method: "GET",
+                    headers: {
+                        "accept": "*/*",
+                    },
+                });
+
+                const data = await response.json().catch(() => null);
+
+                if (!response.ok) {
+                    throw new Error(data?.message || data?.error || `HTTP error! status: ${response.status}`);
+                }
+
+                return data as GetHeroInfoResponse;
+            } catch (err) {
+                heroInfoCache = null;
+                throw err;
+            }
+        })();
+
+        return heroInfoCache;
     },
 
     updateHeroInfo: async (payload: UpdateHeroInfoPayload): Promise<UpdateHeroInfoResponse> => {
+        heroInfoCache = null;
         const formData = new FormData();
 
         // إلحاق القيمة فقط إذا كانت موجودة وغير فارغة لتجنب أخطاء Validation بالـ Backend
@@ -63,4 +79,4 @@ export const heroService = {
 
         return data as UpdateHeroInfoResponse;
     },
-};
+};

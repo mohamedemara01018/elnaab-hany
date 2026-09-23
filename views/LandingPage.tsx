@@ -36,6 +36,8 @@ export default function LandingPage() {
     const [videosData, setVideosData] = useState<GetVideosResponse | null>(null);
 
     useEffect(() => {
+        let isMounted = true;
+
         const fetchLandingData = async () => {
             try {
                 const [
@@ -54,6 +56,8 @@ export default function LandingPage() {
                     videoService.getAll(),
                 ]);
 
+                if (!isMounted) return;
+
                 if (heroRes.status === "fulfilled") setHeroData(heroRes.value);
                 if (achievementsRes.status === "fulfilled") setAchievementsData(achievementsRes.value);
                 if (activityVisitsRes.status === "fulfilled") setActivityVisitsData(activityVisitsRes.value);
@@ -61,11 +65,17 @@ export default function LandingPage() {
                 if (briefingsRes.status === "fulfilled") setBriefingsData(briefingsRes.value);
                 if (videosRes.status === "fulfilled") setVideosData(videosRes.value);
             } catch (err) {
-                console.error("Error fetching landing page data:", err);
+                if (isMounted) {
+                    console.error("Error fetching landing page data:", err);
+                }
             }
         };
 
         fetchLandingData();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
     return (
         <PublicLayout>

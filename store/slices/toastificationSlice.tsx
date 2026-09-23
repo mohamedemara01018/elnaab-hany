@@ -38,8 +38,10 @@ const toastificationSlice = createSlice({
             state,
             action: PayloadAction<IToastification>
         ) => {
-            const id = crypto.randomUUID;
-            state.toastifications.push({ ...action.payload, id: String(id) });
+            const id = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+                ? crypto.randomUUID()
+                : `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+            state.toastifications.push({ ...action.payload, id: action.payload.id || id });
         },
 
         removeToastify: (
