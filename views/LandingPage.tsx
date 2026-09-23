@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 
+// تحقق من حالة الحروف في مسار PublicLayout
 import PublicLayout from "@/components/layout/public/PublicLayout";
 
+// تحقق من أسماء ملفات الخدمات (المفرد والجمع)
 import { heroService } from "@/services/hero.service";
-import { achievementService } from "@/services/achievement.service";
-import { videoService } from "@/services/video.service";
-import { activityVisitService } from "@/services/activities-visits.service";
+import { achievementService } from "@/services/achievement.service"; // أو achievements.service
+import { videoService } from "@/services/video.service"; // أو videos.service
+import { activityVisitService } from "@/services/activities-visits.service"; // أو activity-visits.service
 import { briefingRequestsService } from "@/services/briefing-requests.service";
 import { activitiesService } from "@/services/activities.service";
 
@@ -28,7 +30,6 @@ import { Briefings } from "@/components/landing-page/Briefings";
 import { Gallery } from "@/components/landing-page/Gallery";
 import { Achievements } from "@/components/landing-page/Achievements";
 import { Complaints } from "@/components/landing-page/Complaints";
-
 
 export default function LandingPage() {
     const [heroData, setHeroData] = useState<HeroInfoData | GetHeroInfoResponse | null>(null);
@@ -80,6 +81,7 @@ export default function LandingPage() {
             isMounted = false;
         };
     }, []);
+
     return (
         <PublicLayout>
             <Hero data={heroData} />
