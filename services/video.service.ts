@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     GetVideosResponse,
     GetVideoByIdResponse,
@@ -16,6 +17,58 @@ const getAuthHeaders = (): Record<string, string> => {
         accept: "*/*",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
+};
+
+/**
+ * Helper function to handle multipart requests via XMLHttpRequest for upload progress tracking.
+ */
+const uploadWithProgress = <T>(
+    url: string,
+    method: "POST" | "PUT",
+    formData: FormData,
+    onProgress?: (progress: number) => void
+): Promise<T> => {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+
+        // Attach Auth Headers
+        const headers = getAuthHeaders();
+        Object.entries(headers).forEach(([key, value]) => {
+            xhr.setRequestHeader(key, value);
+        });
+
+        // Track upload progress
+        if (xhr.upload && onProgress) {
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const percent = Math.round((event.loaded / event.total) * 100);
+                    onProgress(percent);
+                }
+            };
+        }
+
+        xhr.onload = () => {
+            let data: any = null;
+            try {
+                data = JSON.parse(xhr.responseText);
+            } catch {
+                data = null;
+            }
+
+            if (xhr.status >= 200 && xhr.status < 300) {
+                resolve(data as T);
+            } else {
+                reject(new Error(data?.message || `HTTP error! status: ${xhr.status}`));
+            }
+        };
+
+        xhr.onerror = () => {
+            reject(new Error("حدث خطأ في الاتصال بالشبكة أثناء رفع الملف."));
+        };
+
+        xhr.send(formData);
+    });
 };
 
 export const videoService = {
@@ -49,48 +102,41 @@ export const videoService = {
         return data as GetVideoByIdResponse;
     },
 
-    create: async (payload: CreateVideoPayload): Promise<CreateVideoResponse> => {
+    create: async (
+        payload: CreateVideoPayload,
+        onProgress?: (progress: number) => void
+    ): Promise<CreateVideoResponse> => {
         const formData = new FormData();
         formData.append("Title", payload.Title);
         if (payload.Media) {
             formData.append("Media", payload.Media);
         }
 
-        const response = await fetch(`${BASE_URL}/api/DeputyWord`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            body: formData,
-        });
-
-        const data = await response.json().catch(() => null);
-
-        if (!response.ok) {
-            throw new Error(data?.message || `HTTP error! status: ${response.status}`);
-        }
-
-        return data as CreateVideoResponse;
+        return uploadWithProgress<CreateVideoResponse>(
+            `${BASE_URL}/api/DeputyWord`,
+            "POST",
+            formData,
+            onProgress
+        );
     },
 
-    update: async (videoId: number, payload: UpdateVideoPayload): Promise<UpdateVideoResponse> => {
+    update: async (
+        videoId: number,
+        payload: UpdateVideoPayload,
+        onProgress?: (progress: number) => void
+    ): Promise<UpdateVideoResponse> => {
         const formData = new FormData();
         if (payload.Title !== undefined) formData.append("Title", payload.Title);
         if (payload.Media) {
             formData.append("Media", payload.Media);
         }
 
-        const response = await fetch(`${BASE_URL}/api/DeputyWord/${videoId}`, {
-            method: "PUT",
-            headers: getAuthHeaders(),
-            body: formData,
-        });
-
-        const data = await response.json().catch(() => null);
-
-        if (!response.ok) {
-            throw new Error(data?.message || `HTTP error! status: ${response.status}`);
-        }
-
-        return data as UpdateVideoResponse;
+        return uploadWithProgress<UpdateVideoResponse>(
+            `${BASE_URL}/api/DeputyWord/${videoId}`,
+            "PUT",
+            formData,
+            onProgress
+        );
     },
 
     delete: async (videoId: number): Promise<DeleteVideoResponse> => {

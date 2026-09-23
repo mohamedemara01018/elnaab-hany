@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -17,15 +18,15 @@ export default function VideosManagementPage() {
     const [items, setItems] = useState<VideoItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState<number>(0);
 
     const [modalMode, setModalMode] = useState<"add" | "edit" | null>(null);
     const [activeItem, setActiveItem] = useState<VideoItem | undefined>(undefined);
     const [deletingItemId, setDeletingItemId] = useState<number | null>(null);
 
-    // حالة التحكم بـ VideoPreviewModal لمشاهدة الفيديو
     const [previewVideo, setPreviewVideo] = useState<{ src: string; title: string } | null>(null);
 
-    // Fetch videos from API
     const fetchVideos = useCallback(async () => {
         setLoading(true);
         try {
@@ -48,23 +49,25 @@ export default function VideosManagementPage() {
     }, [dispatch]);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchVideos();
     }, [fetchVideos]);
 
     const openAddModal = () => {
         setActiveItem(undefined);
+        setUploadProgress(0);
         setModalMode("add");
     };
 
     const openEditModal = (item: VideoItem) => {
         setActiveItem(item);
+        setUploadProgress(0);
         setModalMode("edit");
     };
 
     const closeModal = () => {
         setModalMode(null);
         setActiveItem(undefined);
+        setUploadProgress(0);
     };
 
     const handleRemove = (id: string) => {
@@ -75,7 +78,6 @@ export default function VideosManagementPage() {
         setPreviewVideo({ src, title });
     };
 
-    // Delete video via API
     const handleConfirmRemove = async () => {
         if (!deletingItemId) return;
         setDeleting(true);
@@ -96,29 +98,32 @@ export default function VideosManagementPage() {
         }
     };
 
-    // Save/Update video via Modal and API
     const handleModalSave = async (
         itemData: { title: string; media?: File | Blob },
         id?: string
     ) => {
+        setIsSaving(true);
+        setUploadProgress(0); // إعادة التصفير عند بدء الرفع
+
         try {
             if (id) {
-                // Edit Mode
+                // حالة التعديل (Edit)
                 let mediaFile: File | undefined = undefined;
 
                 if (itemData.media) {
-                    if (itemData.media instanceof File) {
-                        mediaFile = itemData.media;
-                    } else {
-                        // Convert Blob to File if needed by the payload type
-                        mediaFile = new File([itemData.media], "video.mp4", { type: itemData.media.type });
-                    }
+                    mediaFile = itemData.media instanceof File
+                        ? itemData.media
+                        : new File([itemData.media], "video.mp4", { type: itemData.media.type });
                 }
 
-                const response = await videoService.update(Number(id), {
-                    Title: itemData.title,
-                    ...(mediaFile ? { Media: mediaFile } : {}),
-                });
+                const response = await videoService.update(
+                    Number(id),
+                    {
+                        Title: itemData.title,
+                        ...(mediaFile ? { Media: mediaFile } : {}),
+                    },
+                    (progress) => setUploadProgress(progress) // <--- تحديث حالة الرفع
+                );
 
                 if (response.isSuccess) {
                     dispatch(toastify({ message: response.message || "تم تحديث الفيديو بنجاح.", type: "success" }));
@@ -128,9 +133,10 @@ export default function VideosManagementPage() {
                     dispatch(toastify({ message: response.message || "تعذر تحديث الفيديو.", type: "error" }));
                 }
             } else {
-                // Add Mode
+                // حالة الإضافة (Create)
                 if (!itemData.media) {
                     dispatch(toastify({ message: "يرجى تحديد ملف الفيديو.", type: "error" }));
+                    setIsSaving(false);
                     return;
                 }
 
@@ -138,10 +144,10 @@ export default function VideosManagementPage() {
                     ? itemData.media
                     : new File([itemData.media], "video.mp4", { type: itemData.media.type });
 
-                const response = await videoService.create({
-                    Title: itemData.title,
-                    Media: mediaFile,
-                });
+                const response = await videoService.create(
+                    { Title: itemData.title, Media: mediaFile },
+                    (progress) => setUploadProgress(progress) // <--- تحديث حالة الرفع
+                );
 
                 if (response.isSuccess) {
                     dispatch(toastify({ message: response.message || "تمت إضافة الفيديو بنجاح.", type: "success" }));
@@ -154,6 +160,8 @@ export default function VideosManagementPage() {
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : "حدث خطأ أثناء الحفظ.";
             dispatch(toastify({ message, type: "error" }));
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -215,6 +223,8 @@ export default function VideosManagementPage() {
                 initialItem={activeItem}
                 onClose={closeModal}
                 onSave={handleModalSave}
+                isSaving={isSaving}
+                uploadProgress={uploadProgress}
             />
 
             <ConfirmDialog
@@ -232,7 +242,6 @@ export default function VideosManagementPage() {
                 onClose={() => setDeletingItemId(null)}
             />
 
-            {/* Video Player Preview Modal */}
             <VideoPreviewModal
                 isOpen={previewVideo !== null}
                 src={previewVideo?.src || ""}

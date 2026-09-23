@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Upload, CheckCircle2 } from "lucide-react";
+import { X, Upload, CheckCircle2, Loader2 } from "lucide-react";
 import { Field, InputWithIcon } from "@/components/ui/Formfield";
 import { VideoItem } from "@/components/landing-dashboard/video-management-dashboard-page/VideoItemRow";
 
@@ -14,9 +14,18 @@ type ModalProps = {
         itemData: { title: string; media?: File | Blob },
         id?: string
     ) => void;
+    isSaving?: boolean;
+    uploadProgress?: number;
 };
 
-export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
+export function VideoModal({
+    open,
+    initialItem,
+    onClose,
+    onSave,
+    isSaving = false,
+    uploadProgress = 0,
+}: ModalProps) {
     const [title, setTitle] = useState("");
     const [previewUrl, setPreviewUrl] = useState("");
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -35,11 +44,11 @@ export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
     useEffect(() => {
         if (!open) return;
         const handleKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
+            if (e.key === "Escape" && !isSaving) onClose();
         };
         document.addEventListener("keydown", handleKey);
         return () => document.removeEventListener("keydown", handleKey);
-    }, [open, onClose]);
+    }, [open, onClose, isSaving]);
 
     if (!open) return null;
 
@@ -54,6 +63,8 @@ export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (isSaving) return;
+
         onSave(
             {
                 title,
@@ -65,7 +76,13 @@ export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
 
     return (
         <div dir="rtl" className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-            <button type="button" aria-label="إغلاق" onClick={onClose} className="absolute inset-0 bg-slate-dark/50 backdrop-blur-[2px]" />
+            <button
+                type="button"
+                aria-label="إغلاق"
+                disabled={isSaving}
+                onClick={onClose}
+                className="absolute inset-0 bg-slate-dark/50 backdrop-blur-[2px] disabled:pointer-events-none"
+            />
 
             <div className="relative w-full max-w-lg rounded-card bg-surface-container-lowest border border-outline-variant shadow-level-2 z-10 max-h-[90vh] flex flex-col">
                 <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
@@ -78,7 +95,13 @@ export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
                                 أدخل عنوان الفيديو وقام برفع ملف الفيديو الخاص بك.
                             </p>
                         </div>
-                        <button type="button" onClick={onClose} aria-label="إغلاق" className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={isSaving}
+                            aria-label="إغلاق"
+                            className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                        >
                             <X size={16} />
                         </button>
                     </div>
@@ -89,6 +112,7 @@ export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
                                 value={title}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
                                 placeholder="مثال: حلف اليمين داخل البرلمان"
+                                disabled={isSaving}
                                 required
                             />
                         </Field>
@@ -106,24 +130,65 @@ export function VideoModal({ open, initialItem, onClose, onSave }: ModalProps) {
                         )}
 
                         <Field label={initialItem ? "تغيير ملف الفيديو" : "ملف الفيديو"}>
-                            <label className="flex flex-col items-center justify-center gap-2 p-5 rounded-interactive border-2 border-dashed border-outline-variant hover:border-primary/50 bg-surface-container-low cursor-pointer transition-colors">
+                            <label
+                                className={`flex flex-col items-center justify-center gap-2 p-5 rounded-interactive border-2 border-dashed border-outline-variant hover:border-primary/50 bg-surface-container-low transition-colors ${isSaving ? "opacity-50 pointer-events-none" : "cursor-pointer"
+                                    }`}
+                            >
                                 <div className="p-3 rounded-full bg-surface-container-high text-on-surface-variant">
                                     {selectedFile ? <CheckCircle2 size={18} className="text-primary" /> : <Upload size={18} />}
                                 </div>
                                 <span className="text-body-small font-semibold text-primary">
                                     {selectedFile ? selectedFile.name : "اختيار فيديو من الجهاز"}
                                 </span>
-                                <input type="file" accept="video/*" className="hidden" onChange={handleFileChange} />
+                                <input
+                                    type="file"
+                                    accept="video/*"
+                                    className="hidden"
+                                    onChange={handleFileChange}
+                                    disabled={isSaving}
+                                />
                             </label>
                         </Field>
+
+                        {/* Progress Bar Container */}
+                        {isSaving && (
+                            <div className="flex flex-col gap-2 p-4 rounded-interactive bg-surface-container-low border border-outline-variant mt-1">
+                                <div className="flex items-center justify-between text-body-small text-on-surface-variant">
+                                    <span className="font-medium text-on-surface">جارٍ رفع الفيديو وتحديث البيانات...</span>
+                                    <span className="font-semibold text-primary">{uploadProgress}%</span>
+                                </div>
+                                <div className="w-full bg-surface-container-high rounded-full h-2 overflow-hidden">
+                                    <div
+                                        className="bg-primary h-full transition-all duration-300 ease-out"
+                                        style={{ width: `${uploadProgress}%` }}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant bg-surface-container-low rounded-b-card">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-body-small font-semibold text-on-surface-variant hover:bg-surface-container rounded-interactive transition-colors">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={isSaving}
+                            className="px-4 py-2 text-body-small font-semibold text-on-surface-variant hover:bg-surface-container rounded-interactive transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                        >
                             إلغاء
                         </button>
-                        <button type="submit" className="px-5 py-2 text-body-small font-semibold bg-primary text-on-primary rounded-interactive hover:opacity-90 transition-opacity">
-                            حفظ الفيديو
+                        <button
+                            type="submit"
+                            disabled={isSaving}
+                            className="flex items-center gap-2 px-5 py-2 text-body-small font-semibold bg-primary text-on-primary rounded-interactive hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            {isSaving ? (
+                                <>
+                                    <Loader2 size={16} className="animate-spin" />
+                                    <span>جارٍ الحفظ ({uploadProgress}%)</span>
+                                </>
+                            ) : (
+                                <span>حفظ الفيديو</span>
+                            )}
                         </button>
                     </div>
                 </form>
