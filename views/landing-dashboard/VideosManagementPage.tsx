@@ -2,7 +2,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/Pageheader";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { VideoModal as VideoFormModal } from "@/modals/VideoModal";
@@ -14,6 +15,7 @@ import { toastify } from "@/store/slices/toastificationSlice";
 
 export default function VideosManagementPage() {
     const dispatch = useDispatch();
+    const router = useRouter();
 
     const [items, setItems] = useState<VideoItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -103,11 +105,10 @@ export default function VideosManagementPage() {
         id?: string
     ) => {
         setIsSaving(true);
-        setUploadProgress(0); // إعادة التصفير عند بدء الرفع
+        setUploadProgress(0);
 
         try {
             if (id) {
-                // حالة التعديل (Edit)
                 let mediaFile: File | undefined = undefined;
 
                 if (itemData.media) {
@@ -122,7 +123,7 @@ export default function VideosManagementPage() {
                         Title: itemData.title,
                         ...(mediaFile ? { Media: mediaFile } : {}),
                     },
-                    (progress) => setUploadProgress(progress) // <--- تحديث حالة الرفع
+                    (progress) => setUploadProgress(progress)
                 );
 
                 if (response.isSuccess) {
@@ -133,7 +134,6 @@ export default function VideosManagementPage() {
                     dispatch(toastify({ message: response.message || "تعذر تحديث الفيديو.", type: "error" }));
                 }
             } else {
-                // حالة الإضافة (Create)
                 if (!itemData.media) {
                     dispatch(toastify({ message: "يرجى تحديد ملف الفيديو.", type: "error" }));
                     setIsSaving(false);
@@ -146,7 +146,7 @@ export default function VideosManagementPage() {
 
                 const response = await videoService.create(
                     { Title: itemData.title, Media: mediaFile },
-                    (progress) => setUploadProgress(progress) // <--- تحديث حالة الرفع
+                    (progress) => setUploadProgress(progress)
                 );
 
                 if (response.isSuccess) {
@@ -166,6 +166,9 @@ export default function VideosManagementPage() {
     };
 
     const targetDeleteItem = items.find((item) => item.id === String(deletingItemId));
+
+    // عرض أول 6 فيديوهات فقط في لوحة التحكم
+    const displayedItems = items.slice(0, 6);
 
     return (
         <>
@@ -198,7 +201,7 @@ export default function VideosManagementPage() {
                         </div>
                     ) : (
                         <div className="flex flex-col gap-3">
-                            {items.map((item) => (
+                            {displayedItems.map((item) => (
                                 <VideoItemRow
                                     key={item.id}
                                     item={item}
@@ -211,6 +214,20 @@ export default function VideosManagementPage() {
                             {items.length === 0 && (
                                 <div className="rounded-card border border-dashed border-outline-variant py-10 text-center text-body-small text-on-surface-variant">
                                     لا توجد فيديوهات مضافة بعد. ابدأ بإضافة أول فيديو.
+                                </div>
+                            )}
+
+                            {/* زر عرض المزيد إذا كان عدد الفيديوهات أكبر من 6 */}
+                            {items.length > 6 && (
+                                <div className="mt-4 flex justify-center pt-2 border-t border-outline-variant/30">
+                                    <button
+                                        type="button"
+                                        onClick={() => router.push("/landing/videos")}
+                                        className="btn-outline flex items-center gap-2 px-6 py-2.5 text-body-small font-semibold text-primary border-primary/30 hover:bg-primary/5 transition-all"
+                                    >
+                                        <span>عرض المزيد من الفيديوهات ({items.length - 6}+)</span>
+                                        <ArrowLeft size={16} />
+                                    </button>
                                 </div>
                             )}
                         </div>

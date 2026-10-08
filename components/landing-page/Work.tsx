@@ -45,7 +45,7 @@ export function Work({ data }: WorkProps) {
           size="large"
         />
       ) : (
-        <NumberedCardGrid items={items} />
+        <NumberedCardGrid items={items} limit={6} seeMoreHref="/landing/activities" />
       )}
     </Section>
   );

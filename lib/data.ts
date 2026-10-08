@@ -12,14 +12,15 @@ import type {
    =========================================================== */
 
 export const NAV_LINKS: NavLink[] = [
-  { href: "#home", label: "الرئيسية" },
-  { href: "#about", label: "السيرة الذاتية" },
-  { href: "#work", label: "مجالات العمل" },
-  { href: "#videos", label: "لقاءات تلفزيونية وبرلمانية" },
-  { href: "#gallery", label: "الفعاليات" },
-  { href: "#achievements", label: "ما تم انجازه" },
-  { href: "#complaints", label: "تقديم شكوى او اقتراح" },
-  { href: "#contact", label: "تواصل معنا" },
+  { href: "/#home", label: "الرئيسية" },
+  { href: "/#about", label: "السيرة الذاتية" },
+  { href: "/#work", label: "مجالات العمل" },
+  { href: "/#videos", label: "لقاءات تلفزيونية وبرلمانية" },
+  { href: "/#briefings", label: "طلبات الإحاطة" },
+  { href: "/#gallery", label: "الفعاليات" },
+  { href: "/#achievements", label: "ما تم انجازه" },
+  { href: "/#complaints", label: "تقديم شكوى او اقتراح" },
+  { href: "/#contact", label: "تواصل معنا" },
 ];
 
 export const FACTS: Fact[] = [

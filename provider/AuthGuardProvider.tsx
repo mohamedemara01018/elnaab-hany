@@ -20,6 +20,8 @@ interface TokenPayload extends JWTPayload {
 const socialRoutes = ["/admin", "/briefing-requests", "/achievements", "/team", "/events", "/activities", "/videos"];
 const employeeRoutes = ["/employee"];
 const adminRoutes = ["/social", "/register-employee", "/employees"];
+
+// تم إزالة '/landing' من المسارات المحمية لأن الصفحة العامة والأنشطة التابعة لها متاحة للجميع
 const sharedProtectedRoutes = ["/profile", "/settings", "/change-password"];
 
 const authRoutes = [
@@ -90,10 +92,14 @@ export function AuthGuardProvider({ children }: { children: React.ReactNode }) {
     const authInfo = useSyncExternalStore(subscribeStorage, getStoredAuthInfo, getServerAuthInfo);
 
     const isAuthRoute = matchRoute(pathname, authRoutes);
-    const isAdminRoute = matchRoute(pathname, adminRoutes);
-    const isEmployeeRoute = matchRoute(pathname, employeeRoutes);
-    const isSocialRoute = matchRoute(pathname, socialRoutes);
-    const isSharedProtectedRoute = matchRoute(pathname, sharedProtectedRoutes);
+
+    // استثناء صريح لأي مسار يتبع /landing أو الصفحة الرئيسية العامة
+    const isPublicLandingRoute = pathname === "/" || pathname.startsWith("/landing");
+
+    const isAdminRoute = !isPublicLandingRoute && matchRoute(pathname, adminRoutes);
+    const isEmployeeRoute = !isPublicLandingRoute && matchRoute(pathname, employeeRoutes);
+    const isSocialRoute = !isPublicLandingRoute && matchRoute(pathname, socialRoutes);
+    const isSharedProtectedRoute = !isPublicLandingRoute && matchRoute(pathname, sharedProtectedRoutes);
 
     const isProtectedRoute =
         isAdminRoute || isEmployeeRoute || isSocialRoute || isSharedProtectedRoute;
@@ -165,4 +171,3 @@ export function AuthGuardProvider({ children }: { children: React.ReactNode }) {
 
     return <>{children}</>;
 }
-

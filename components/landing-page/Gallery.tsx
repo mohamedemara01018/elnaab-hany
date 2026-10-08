@@ -46,7 +46,7 @@ export function Gallery({ data }: GalleryProps) {
           size="large"
         />
       ) : (
-        <NumberedCardGrid items={gridItems} />
+        <NumberedCardGrid items={gridItems} limit={6} seeMoreHref="/landing/gallery" />
       )}
     </Section>
   );

@@ -41,7 +41,7 @@ export function Briefings({ data }: BriefingsProps) {
           size="large"
         />
       ) : (
-        <NumberedCardGrid items={items} />
+        <NumberedCardGrid items={items} limit={6} seeMoreHref="/landing/briefings" />
       )}
     </Section>
   );
