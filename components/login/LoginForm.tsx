@@ -25,7 +25,6 @@ function LoginForm() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setSubmitting(true);
-
         try {
             const response = await authService.login({ email, password });
 

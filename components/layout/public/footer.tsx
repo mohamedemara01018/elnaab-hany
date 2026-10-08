@@ -1,7 +1,13 @@
-import Link from "next/link";
+"use client"
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function Footer() {
+  const router = useRouter();
+  const handleGoToLoginPage = () => {
+    localStorage.removeItem('accessToken');
+    router.push('/login')
+  }
   return (
     <footer className="bg-surface-container-high text-inverse-on-surface py-14 pb-6">
       <div className="wrapper grid md:grid-cols-[2fr_1fr_1fr] gap-8">
@@ -45,10 +51,10 @@ export function Footer() {
       </div>
 
       <div className="text-center mt-10">
-        <Link href="/login" className="text-gold-highlight text-sm inline-flex items-center gap-1 hover:underline" aria-label="دخول الإدارة">
+        <button onClick={handleGoToLoginPage} className="text-gold-highlight text-sm inline-flex items-center gap-1 hover:underline" aria-label="دخول الإدارة">
           <span>دخول الإدارة</span>
           <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
-        </Link>
+        </button>
       </div>
 
       <div className="wrapper text-center mt-6 pt-5 border-t border-white/10 text-xs text-on-surface-variant">
