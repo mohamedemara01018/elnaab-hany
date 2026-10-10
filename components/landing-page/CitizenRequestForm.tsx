@@ -26,7 +26,7 @@ const COPY = {
     detailsLabel: "تفاصيل الشكوى أو الطلب",
     detailsPlaceholder: "اكتب تفاصيل الشكوى أو الطلب بالتفصيل...",
     uploadLabel: "صورة مرفقة",
-    uploadHint: "JPG / JPEG / PNG / WEBP — بحد أقصى 5MB",
+    uploadHint: "JPG / JPEG / PNG / WEBP / PDF / DOC / DOCX — بحد أقصى 5MB",
     submitLabelText: "إرسال الشكوى أو الطلب",
   },
   proposal: {
@@ -37,7 +37,7 @@ const COPY = {
     detailsLabel: "تفاصيل المقترح",
     detailsPlaceholder: "اكتب فكرتك أو المقترح بالتفصيل...",
     uploadLabel: "صورة أو ملف مرفق",
-    uploadHint: "JPG / JPEG / PNG / PDF — بحد أقصى 5MB",
+    uploadHint: "JPG / JPEG / PNG / WEBP / PDF / DOC / DOCX — بحد أقصى 5MB",
     submitLabelText: "إرسال المقترح",
   },
 } as const;

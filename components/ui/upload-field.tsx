@@ -9,15 +9,22 @@ interface UploadFieldProps {
   label: string;
   optional?: boolean;
   hint: string;
-  value?: File | null; // إضافة قيمة الملف كمقترحة من الأب
+  value?: File | null;
+  accept?: string; // إضافة خاصية مخصصة للأنواع المقبولة (اختياري)
   onChange?: (file: File | null) => void;
 }
 
-export function UploadField({ label, optional, hint, value, onChange }: UploadFieldProps) {
+export function UploadField({
+  label,
+  optional,
+  hint,
+  value,
+  accept = "image/*,.pdf,.doc,.docx,.xls,.xlsx", // تحديد الصور والملفات الافتراضية
+  onChange,
+}: UploadFieldProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(value || null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // مزامنة الحالة الداخلية إذا قام الأب بتصفير القيمة (مثل جعلها null)
   useEffect(() => {
     if (value === null) {
       setSelectedFile(null);
@@ -67,9 +74,11 @@ export function UploadField({ label, optional, hint, value, onChange }: UploadFi
         <span className="text-body-small font-normal">{hint}</span>
       </motion.div>
 
+      {/* إضافة الخاصية accept لمنع فتح ملفات أخرى غير الصور والمستندات */}
       <input
         ref={inputRef}
         type="file"
+        accept={accept}
         hidden
         onChange={handleFileChange}
       />
