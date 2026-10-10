@@ -268,6 +268,7 @@ export function CitizenRequestForm({
             label={c.uploadLabel}
             optional
             hint={c.uploadHint}
+            value={selectedFile} // <-- تمرير الحالة هنا ليتم تصفيرها تلقائياً عند إعادة تعيين النموذج
             onChange={(file) => setSelectedFile(file)}
           />
 

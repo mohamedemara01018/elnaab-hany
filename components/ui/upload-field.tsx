@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Paperclip, X } from "lucide-react";
 
@@ -8,12 +9,23 @@ interface UploadFieldProps {
   label: string;
   optional?: boolean;
   hint: string;
+  value?: File | null; // إضافة قيمة الملف كمقترحة من الأب
   onChange?: (file: File | null) => void;
 }
 
-export function UploadField({ label, optional, hint, onChange }: UploadFieldProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+export function UploadField({ label, optional, hint, value, onChange }: UploadFieldProps) {
+  const [selectedFile, setSelectedFile] = useState<File | null>(value || null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // مزامنة الحالة الداخلية إذا قام الأب بتصفير القيمة (مثل جعلها null)
+  useEffect(() => {
+    if (value === null) {
+      setSelectedFile(null);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    }
+  }, [value]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
