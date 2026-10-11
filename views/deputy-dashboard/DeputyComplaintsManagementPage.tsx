@@ -78,7 +78,7 @@ export default function DeputyComplaintsManagementPage() {
     );
 
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [totalPages, setTotalPages] = useState<number>(1); // 👈 أضفنا تخزين عدد الصفحات الفعلي من الـ API
+    const [totalPages, setTotalPages] = useState<number>(1);
 
     const [stats, setStats] = useState({
         done: 0,
@@ -152,7 +152,6 @@ export default function DeputyComplaintsManagementPage() {
 
                 setRows(mappedRows);
 
-                // 👈 تحديث إجمالي الصفحات الفعلي بناءً على استجابة الـ API مباشرة
                 if (requestsRes.value.totalPages) {
                     setTotalPages(requestsRes.value.totalPages);
                 }
@@ -225,6 +224,7 @@ export default function DeputyComplaintsManagementPage() {
         }
     };
 
+    // 👈 إغلاق النافذة المنبثقة وتحديث البيانات فور الإنشاء بنجاح
     const handleCreateSuccess = async () => {
         setIsCreateModalOpen(false);
         await fetchData();
