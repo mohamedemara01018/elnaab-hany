@@ -30,9 +30,11 @@ const mapStatusToUI = (statusNum?: number): ComplaintStatus => {
         case 2:
             return "in_progress";
         case 3:
+            return "done";         // تم الإنجاز
         case 4:
+            return "rejected";     // مرفوضة
         case 5:
-            return "done";
+            return "closed";       // مغلقة
         default:
             return "new";
     }
@@ -59,6 +61,7 @@ export default function ComplaintsManagementPage() {
     const [statusFilter, setStatusFilter] = useState<string>("all");
     const [typeFilter, setTypeFilter] = useState<string>("all");
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1); // 👈 حالة تخزين عدد الصفحات الفعلي من الـ API
 
     const [stats, setStats] = useState({
         done: 0,
@@ -117,6 +120,11 @@ export default function ComplaintsManagementPage() {
                 );
 
                 setRows(mappedRows);
+
+                // 👈 تحديث عدد الصفحات الكلي بناءً على نتيجة الـ API الفعلية للفلتر
+                if (requestsRes.value.totalPages) {
+                    setTotalPages(requestsRes.value.totalPages);
+                }
             }
 
             if (statsRes?.value) {
@@ -198,8 +206,6 @@ export default function ComplaintsManagementPage() {
             row.nationalId.includes(q)
         );
     });
-
-    const totalPages = Math.max(1, Math.ceil(stats.total / PAGE_SIZE));
 
     return (
         <>

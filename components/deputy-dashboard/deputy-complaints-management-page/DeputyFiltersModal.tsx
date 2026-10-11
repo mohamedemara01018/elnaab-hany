@@ -3,20 +3,10 @@
 import { useEffect, useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { ComplaintPriority } from "@/types/deputy.types";
-
-// TODO: replace with real endpoints once available
-// e.g. deputyService.getDepartments() / deputyService.getOrganizations()
-const DEPARTMENT_OPTIONS = [
-    { id: 1, label: "قطاع العلاقات العامة" },
-    { id: 2, label: "قطاع المتابعة الميدانية والاتصال الحكومي" },
-    { id: 3, label: "قطاع الشؤون القانونية" },
-];
-
-const ORGANIZATION_OPTIONS = [
-    { id: 101, label: "مجلس النواب المصري" },
-    { id: 204, label: "ديوان عام محافظة القليوبية" },
-    { id: 310, label: "مديرية الشؤون الصحية بالقليوبية" },
-];
+import { departmentService } from "@/services/department.service";
+import { organizationService } from "@/services/organization.service";
+import { Department } from "@/types/department.types";
+import { Organization } from "@/types/organization.types";
 
 const PRIORITY_LABELS: Record<ComplaintPriority, string> = {
     [ComplaintPriority.Low]: "منخفضة",
@@ -51,11 +41,32 @@ export function DeputyFiltersModal({
     onApply,
 }: DeputyFiltersModalProps) {
     const [draft, setDraft] = useState<DeputyAdvancedFilters>(initialFilters);
+    const [departments, setDepartments] = useState<Department[]>([]);
+    const [organizations, setOrganizations] = useState<Organization[]>([]);
+    const [loadingOptions, setLoadingOptions] = useState(false);
 
-    // Reset the draft to whatever filters are currently active whenever the modal opens
+    // جلب الأقسام والجهات عند فتح النافذة
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        if (open) setDraft(initialFilters);
+        if (open) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setDraft(initialFilters);
+            const fetchFilterOptions = async () => {
+                setLoadingOptions(true);
+                try {
+                    const [deptRes, orgRes] = await Promise.all([
+                        departmentService.getDepartments(),
+                        organizationService.getOrganizations(),
+                    ]);
+                    if (deptRes) setDepartments(deptRes);
+                    if (orgRes) setOrganizations(orgRes);
+                } catch (error) {
+                    console.error("فشل في جلب خيارات الأقسام والجهات:", error);
+                } finally {
+                    setLoadingOptions(false);
+                }
+            };
+            fetchFilterOptions();
+        }
     }, [open, initialFilters]);
 
     useEffect(() => {
@@ -105,6 +116,7 @@ export function DeputyFiltersModal({
                 </div>
 
                 <div className="px-6 py-5 flex flex-col gap-5">
+                    {/* فلاتر الأولوية */}
                     <div>
                         <label className="text-body-small font-semibold text-on-surface-variant mb-2 block">
                             الأولوية (Priority)
@@ -112,7 +124,7 @@ export function DeputyFiltersModal({
                         <select
                             value={draft.priority}
                             onChange={(e) => setDraft((f) => ({ ...f, priority: e.target.value }))}
-                            className="input-field w-full py-2.5 px-3 text-body-small text-on-surface-variant"
+                            className="input-field w-full py-2.5 px-3 text-body-small text-on-surface-variant cursor-pointer"
                         >
                             <option value="all">كل الأولويات</option>
                             {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
@@ -123,6 +135,7 @@ export function DeputyFiltersModal({
                         </select>
                     </div>
 
+                    {/* فلاتر الأقسام */}
                     <div>
                         <label className="text-body-small font-semibold text-on-surface-variant mb-2 block">
                             القسم / الإدارة (DepartmentId)
@@ -130,17 +143,19 @@ export function DeputyFiltersModal({
                         <select
                             value={draft.departmentId}
                             onChange={(e) => setDraft((f) => ({ ...f, departmentId: e.target.value }))}
-                            className="input-field w-full py-2.5 px-3 text-body-small text-on-surface-variant"
+                            disabled={loadingOptions}
+                            className="input-field w-full py-2.5 px-3 text-body-small text-on-surface-variant cursor-pointer disabled:opacity-50"
                         >
                             <option value="all">كل الأقسام</option>
-                            {DEPARTMENT_OPTIONS.map((d) => (
+                            {departments.map((d) => (
                                 <option key={d.id} value={d.id}>
-                                    {d.label}
+                                    {d.name}
                                 </option>
                             ))}
                         </select>
                     </div>
 
+                    {/* فلاتر الجهات */}
                     <div>
                         <label className="text-body-small font-semibold text-on-surface-variant mb-2 block">
                             الجهة (OrganizationId)
@@ -148,12 +163,13 @@ export function DeputyFiltersModal({
                         <select
                             value={draft.organizationId}
                             onChange={(e) => setDraft((f) => ({ ...f, organizationId: e.target.value }))}
-                            className="input-field w-full py-2.5 px-3 text-body-small text-on-surface-variant"
+                            disabled={loadingOptions}
+                            className="input-field w-full py-2.5 px-3 text-body-small text-on-surface-variant cursor-pointer disabled:opacity-50"
                         >
                             <option value="all">كل الجهات</option>
-                            {ORGANIZATION_OPTIONS.map((o) => (
+                            {organizations.map((o) => (
                                 <option key={o.id} value={o.id}>
-                                    {o.label}
+                                    {o.name}
                                 </option>
                             ))}
                         </select>

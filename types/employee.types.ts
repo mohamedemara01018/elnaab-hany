@@ -57,8 +57,13 @@ export interface EmployeeRequestItem {
     comments: CommentInfo[];
 }
 
+// 👇 التحديث هنا: إضافة خصائص الترقيم المفقودة لتتوافق مع استجابة الـ API
 export interface EmployeeRequestsValue {
     items: EmployeeRequestItem[];
+    pageNumber: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
 }
 
 export type EmployeeRequestsResponse = ApiResponse<EmployeeRequestsValue>;

@@ -18,6 +18,7 @@ export function Pagination({
     pageSize,
     totalItems,
 }: PaginationProps) {
+    // 👈 إخفاء الـ pagination تماماً إذا كانت الصفحة الحالية أو إجمالي الصفحات <= 1
     if (totalPages <= 1) return null;
 
     const getPageNumbers = () => {

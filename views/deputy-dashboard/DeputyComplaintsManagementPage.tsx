@@ -38,9 +38,11 @@ const mapStatusToUI = (statusNum?: number) => {
         case RequestStatus.InProgress:
             return "in_progress" as const;
         case RequestStatus.Resolved:
-        case RequestStatus.Rejected:
-        case RequestStatus.Closed:
             return "done" as const;
+        case RequestStatus.Rejected:
+            return "rejected" as const;
+        case RequestStatus.Closed:
+            return "closed" as const;
         default:
             return "new" as const;
     }
@@ -76,6 +78,7 @@ export default function DeputyComplaintsManagementPage() {
     );
 
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1); // 👈 أضفنا تخزين عدد الصفحات الفعلي من الـ API
 
     const [stats, setStats] = useState({
         done: 0,
@@ -134,7 +137,6 @@ export default function DeputyComplaintsManagementPage() {
                             date: item.request?.createdAt
                                 ? new Date(item.request.createdAt).toLocaleDateString("ar-EG")
                                 : "-",
-                            // Kept for any code still reading a single name; prefer `employees` going forward.
                             employee: firstEmp?.fullName || "-",
                             employees,
                             status: mapStatusToUI(item.request?.status),
@@ -149,6 +151,11 @@ export default function DeputyComplaintsManagementPage() {
                 );
 
                 setRows(mappedRows);
+
+                // 👈 تحديث إجمالي الصفحات الفعلي بناءً على استجابة الـ API مباشرة
+                if (requestsRes.value.totalPages) {
+                    setTotalPages(requestsRes.value.totalPages);
+                }
             }
 
             if (statsRes?.value) {
@@ -222,10 +229,6 @@ export default function DeputyComplaintsManagementPage() {
         setIsCreateModalOpen(false);
         await fetchData();
     };
-
-    // Search, type and status are now applied server-side via queryParams,
-    // so `rows` from the API already reflects the current filters.
-    const totalPages = Math.max(1, Math.ceil(stats.total / PAGE_SIZE));
 
     return (
         <>
@@ -365,7 +368,7 @@ export default function DeputyComplaintsManagementPage() {
                         totalPages={totalPages}
                         onPageChange={(page: SetStateAction<number>) => setCurrentPage(page)}
                         pageSize={PAGE_SIZE}
-                        totalItems={stats.total}
+                        totalItems={rows.length}
                     />
                 </section>
             </div>
