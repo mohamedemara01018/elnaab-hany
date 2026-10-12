@@ -124,6 +124,7 @@ export interface EmployeeRankingResponse {
 
 // Flat row shape for the deputy complaints table/modals
 export interface ComplaintRow {
+    assignedEmployees: never[];
     id: string;
     citizenName: string;
     phone: string;

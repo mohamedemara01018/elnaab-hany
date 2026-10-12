@@ -1,4 +1,4 @@
-"use client";
+"use React";
 
 import React, { useState } from "react";
 import {
@@ -147,7 +147,6 @@ function DeputyComplaintDetailModalContent({
                             </div>
                         </div>
 
-                        {/* Full list of assigned employees, not just the first one */}
                         <div>
                             <label className="text-body-small font-medium text-on-surface-variant mb-1.5 flex items-center gap-1.5">
                                 <Users size={16} className="text-primary" />
@@ -250,12 +249,13 @@ function DeputyComplaintDetailModalContent({
 
                     {onUpdateStatus && (
                         <form onSubmit={handleSubmit} className="space-y-4 pt-4 border-t border-outline-variant">
-                            <h4 className="text-body-main font-semibold text-on-surface flex items-center gap-2">
+                            {/* <h4 className="text-body-main font-semibold text-on-surface flex items-center gap-2">
                                 <AlertCircle size={16} className="text-primary" />
                                 <span>تحديث حالة الشكوى والأولوية</span>
-                            </h4>
+                            </h4> */}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {/* 👈 تم ترتيب وتعديل اتجاه الحقول بحيث تظهر "تغيير الحالة" و "الأولوية" بشكل متناسق ومضبوط */}
+                            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-body-small font-medium text-on-surface-variant mb-1">
                                         تغيير الحالة
@@ -290,9 +290,9 @@ function DeputyComplaintDetailModalContent({
                                         <option value={ComplaintPriority.Critical}>حرجة</option>
                                     </select>
                                 </div>
-                            </div>
+                            </div> */}
 
-                            <div>
+                            {/* <div>
                                 <label className="block text-body-small font-medium text-on-surface-variant mb-1">
                                     إضافة ملاحظة / رد (اختياري)
                                 </label>
@@ -304,7 +304,7 @@ function DeputyComplaintDetailModalContent({
                                     className="w-full px-3 py-2 border border-outline-variant rounded-interactive bg-surface-container-low text-on-surface text-body-small focus:outline-none focus:border-primary disabled:opacity-60"
                                     placeholder="اكتب ملاحظاتك على الإجراء المتخذ..."
                                 />
-                            </div>
+                            </div> */}
 
                             <div className="flex justify-end gap-3 pt-2">
                                 <button
@@ -315,14 +315,14 @@ function DeputyComplaintDetailModalContent({
                                 >
                                     إغلاق
                                 </button>
-                                <button
+                                {/* <button
                                     type="submit"
                                     disabled={submitting || deleting}
                                     className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-interactive text-body-small font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                                 >
                                     {submitting && <Loader2 size={16} className="animate-spin" />}
                                     <span>حفظ التحديث</span>
-                                </button>
+                                </button> */}
                             </div>
                         </form>
                     )}
