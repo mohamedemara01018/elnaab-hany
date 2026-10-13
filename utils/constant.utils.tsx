@@ -13,6 +13,9 @@ import {
     Home,          // أيقونة الصفحة الرئيسية
 } from "lucide-react";
 
+
+export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export const NAV_ITEMS_MAHER_DASH = [
     { href: "/", label: "نظرة عامة", icon: LayoutGrid },
     { href: "/briefing-requests", label: "طلبات الإحاطة", icon: FileText },

@@ -1,6 +1,6 @@
 import { GetDepartmentsResponse } from "@/types/department.types";
+import { BASE_URL } from "@/utils/constant.utils";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const departmentService = {
     getDepartments: async (): Promise<GetDepartmentsResponse> => {

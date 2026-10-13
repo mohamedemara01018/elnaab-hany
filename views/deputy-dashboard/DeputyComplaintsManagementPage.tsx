@@ -139,6 +139,7 @@ export default function DeputyComplaintsManagementPage() {
                                 : "-",
                             employee: firstEmp?.fullName || "-",
                             employees,
+                            assignedEmployees: employees, // 👈 تم إضافة هذا الحقل لحل خطأ TypeScript
                             status: mapStatusToUI(item.request?.status),
                             rawStatus: item.request?.status,
                             priority: item.request?.priority,
@@ -224,7 +225,6 @@ export default function DeputyComplaintsManagementPage() {
         }
     };
 
-    // 👈 إغلاق النافذة المنبثقة وتحديث البيانات فور الإنشاء بنجاح
     const handleCreateSuccess = async () => {
         setIsCreateModalOpen(false);
         await fetchData();

@@ -4,8 +4,8 @@ import {
     DeputyStatisticsResponse,
     EmployeeRankingResponse,
 } from "@/types/deputy.types";
+import { BASE_URL } from "@/utils/constant.utils";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const getAuthHeaders = (): Record<string, string> => {
     const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;

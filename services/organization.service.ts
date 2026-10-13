@@ -1,6 +1,6 @@
 import { GetOrganizationsResponse } from "@/types/organization.types";
+import { BASE_URL } from "@/utils/constant.utils";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const organizationService = {
     getOrganizations: async (): Promise<GetOrganizationsResponse> => {

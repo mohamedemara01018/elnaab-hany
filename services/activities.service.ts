@@ -1,8 +1,5 @@
 import { ApiResponse, Activity, CreateActivityDto, UpdateActivityDto } from "@/types/activities.types";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
-    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/areas-of-work`
-    : "https://deputyproject20260826153754-hvayeugeehdpf2hy.italynorth-01.azurewebsites.net/api/areas-of-work";
+import { BASE_URL } from "@/utils/constant.utils";
 
 const getAuthHeaders = (): Record<string, string> => {
     const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
@@ -11,41 +8,46 @@ const getAuthHeaders = (): Record<string, string> => {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
 };
+
 export const activitiesService = {
     /**
      * Get all activities / areas of work
      */
     getAll: async (): Promise<ApiResponse<Activity[]>> => {
-        const response = await fetch(BASE_URL, {
+        const response = await fetch(`${BASE_URL}/api/areas-of-work`, {
             method: "GET",
             headers: {
                 accept: "*/*",
             },
         });
 
+        const data = await response.json().catch(() => null);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(data?.message || `HTTP error! status: ${response.status}`);
         }
 
-        return response.json();
+        return data as ApiResponse<Activity[]>;
     },
 
     /**
      * Get single activity / area of work by ID
      */
     getById: async (areaId: number): Promise<ApiResponse<Activity>> => {
-        const response = await fetch(`${BASE_URL}/${areaId}`, {
+        const response = await fetch(`${BASE_URL}/api/areas-of-work/${areaId}`, {
             method: "GET",
             headers: {
                 accept: "*/*",
             },
         });
 
+        const data = await response.json().catch(() => null);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(data?.message || `HTTP error! status: ${response.status}`);
         }
 
-        return response.json();
+        return data as ApiResponse<Activity>;
     },
 
     /**
@@ -60,17 +62,19 @@ export const activitiesService = {
             formData.append("Image", data.Image);
         }
 
-        const response = await fetch(BASE_URL, {
+        const response = await fetch(`${BASE_URL}/api/areas-of-work`, {
             method: "POST",
             headers: getAuthHeaders(),
             body: formData,
         });
 
+        const responseData = await response.json().catch(() => null);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(responseData?.message || `HTTP error! status: ${response.status}`);
         }
 
-        return response.json();
+        return responseData as ApiResponse<Activity>;
     },
 
     /**
@@ -89,32 +93,36 @@ export const activitiesService = {
             formData.append("Image", data.Image);
         }
 
-        const response = await fetch(`${BASE_URL}/${areaId}`, {
+        const response = await fetch(`${BASE_URL}/api/areas-of-work/${areaId}`, {
             method: "PUT",
             headers: getAuthHeaders(),
             body: formData,
         });
 
+        const responseData = await response.json().catch(() => null);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(responseData?.message || `HTTP error! status: ${response.status}`);
         }
 
-        return response.json();
+        return responseData as ApiResponse<Activity>;
     },
 
     /**
      * Delete activity / area of work by ID
      */
     delete: async (areaId: number): Promise<ApiResponse<number>> => {
-        const response = await fetch(`${BASE_URL}/${areaId}`, {
+        const response = await fetch(`${BASE_URL}/api/areas-of-work/${areaId}`, {
             method: "DELETE",
             headers: getAuthHeaders(),
         });
 
+        const data = await response.json().catch(() => null);
+
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(data?.message || `HTTP error! status: ${response.status}`);
         }
 
-        return response.json();
+        return data as ApiResponse<number>;
     },
 };

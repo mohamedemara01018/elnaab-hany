@@ -12,8 +12,8 @@ import {
     CreateEmployeePayload,
     CreateEmployeeResponse,
 } from "@/types/auth.types";
+import { BASE_URL } from "@/utils/constant.utils";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const authService = {
     login: async (payload: LoginPayload): Promise<LoginResponse> => {
